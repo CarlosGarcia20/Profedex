@@ -1,16 +1,22 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import profedex from "../../assets/images/Profedex.png";
 
 export default function Login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log("User:", user);
-    console.log("Password:", password);
-    alert("Intento de inicio de sesion");
+    // Aquí añadirías tu lógica de autenticación
+    // Por ahora simularemos diferentes rutas según el tipo de usuario
+    if (user.includes("teacher")) {
+      navigate("/teacher");
+    } else {
+      navigate("/student");
+    }
   };
 
   return (
@@ -83,6 +89,10 @@ export default function Login() {
           <div className="text-center">
             <a
               href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/register");
+              }}
               className="text-sm text-blue-900 underline hover:text-blue-950"
             >
               Registrarme
