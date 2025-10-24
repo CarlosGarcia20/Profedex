@@ -53,7 +53,7 @@ export default function Login() {
             </label>
             <input
               type="password"
-              className="w-full py-1 border rounded-md bg-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full py-1 border rounded-md bg-white border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
