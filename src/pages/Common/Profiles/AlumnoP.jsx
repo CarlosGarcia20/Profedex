@@ -1,7 +1,7 @@
 import DashboardLayout from "../../../layouts/DashboardLayout";
 import Header from "../../../components/header/HeaderGeneral";
 
-const Perfil = () => {
+const AlumnoPerfil = () => {
     return (
     <DashboardLayout>
 
@@ -85,4 +85,4 @@ const Perfil = () => {
   );
 };
 
-export default Perfil;
+export default AlumnoPerfil;

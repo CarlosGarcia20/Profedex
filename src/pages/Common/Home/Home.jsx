@@ -1,13 +1,10 @@
 import DashboardLayout from "../../../layouts/DashboardLayout";
+import Header from "../../../components/header/HeaderGeneral";
 
 export default function Home() {
     return (
         <DashboardLayout>
-            <header className="bg-yellow-400 p-4 shadow-md z-10">
-                <h1 className="text-3xl font-bold text-gray-800">
-                    Bienvenido(a)
-                </h1>
-            </header>
+            <Header titulo="Bienvenido(a)" />
 
             <nav className="bg-gray-300 p-4 relative flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg rounded-b-md">
                 <div className="text-xl font-bold text-blue-700">

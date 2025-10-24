@@ -1,12 +1,11 @@
 import DashboardLayout from "../../../layouts/DashboardLayout";
+import Header from "../../../components/header/HeaderGeneral";
 
 export default function HomeTeacher() {
   return (
     <DashboardLayout>
       <div className="mx-auto bg-gray-300 rounded-lg shadow-xl overflow-hidden">
-        <header className="bg-yellow-400 p-6">
-          <h1 className="text-3xl font-bold text-white">Bienvenido(a)</h1>
-        </header>
+        <Header titulo="Bienvenido(a)" />
 
         <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">

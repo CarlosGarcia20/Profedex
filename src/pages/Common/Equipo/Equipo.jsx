@@ -1,12 +1,11 @@
 import DashboardLayout from "../../../layouts/DashboardLayout"
+import Header from "../../../components/header/HeaderGeneral";
 
 export default function Equipo() {
     return (
       <DashboardLayout>
         <div className="mx-auto bg-gray-300 rounded-lg shadow-xl overflow-hidden">
-          <header className="bg-yellow-400 p-4 shadow-md z-10">
-            <h1 className="text-3xl font-bold text-gray-800">Tu equipo</h1>
-          </header>
+          <Header titulo="Tu Equipo" />
 
           <main className="p-6 flex flex-col lg:flex-row gap-8 h-full min-h-[500px]">
             {/* Columna izquierda: Grupo y Horario */}
