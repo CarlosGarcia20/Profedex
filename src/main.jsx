@@ -25,6 +25,7 @@ root.render(
         <Route path="/student/team" element={<Equipo />} />
         <Route path="/teacher" element={<HomeTeacher />} />
         <Route path="/teacher/profile" element={<MaestroP />} />
+		<Route path="/community" element={<CommunityContent />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>

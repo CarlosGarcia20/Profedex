@@ -55,7 +55,9 @@ export default function Sidebar() {
           href="#"
           className="p-2 rounded-lg hover:bg-red-700 transition-colors"
         >
-          <FaFileUpload className="w-8 h-8" />
+          <Link to="/community">
+            <FaFileUpload className="w-8 h-8" />
+          </Link>
         </a>
       </nav>
 
