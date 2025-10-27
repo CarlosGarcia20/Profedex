@@ -3,8 +3,7 @@ import Header from "../../../components/header/HeaderGeneral";
 
 const AlumnoPerfil = () => {
     return (
-    <DashboardLayout>
-
+    <div>
         <div className="min-h-screen bg-gray-100 flex flex-col">
             <Header titulo="Datos del Perfil" />
             <div className="flex flex-col lg:flex-row justify-between items-start p-8 gap-8">
@@ -81,7 +80,7 @@ const AlumnoPerfil = () => {
                 </div>
             </div>
         </div>
-    </DashboardLayout>
+    </div>
   );
 };
 

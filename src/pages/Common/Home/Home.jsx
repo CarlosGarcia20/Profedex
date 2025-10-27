@@ -3,7 +3,8 @@ import Header from "../../../components/header/HeaderGeneral";
 
 export default function Home() {
     return (
-        <DashboardLayout>
+        <div>
+
             <Header titulo="Bienvenido(a)" />
 
             <nav className="bg-gray-300 p-4 relative flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg rounded-b-md">
@@ -51,6 +52,6 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
+        </div>
     );
 }
