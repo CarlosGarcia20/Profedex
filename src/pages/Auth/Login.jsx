@@ -10,13 +10,13 @@ export default function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Aquí añadirías tu lógica de autenticación
-    // Por ahora simularemos diferentes rutas según el tipo de usuario
-    if (user.includes("teacher")) {
-      navigate("/teacher");
-    } else {
-      navigate("/student");
-    }
+    const role = user.includes("teacher") ? "teacher" : "student";
+
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("role", role);
+    localStorage.setItem("username", user);
+
+    navigate(`/${role}`);
   };
 
   return (

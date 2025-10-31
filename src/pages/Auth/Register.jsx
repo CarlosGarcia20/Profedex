@@ -34,7 +34,7 @@ export default function Register() {
               htmlFor="fullName"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Usuario:
+              Nombre:
             </label>
             <input
               type="text"
@@ -51,7 +51,7 @@ export default function Register() {
                 htmlFor="nickname"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Apodo
+                Apodo:
               </label>
               <input
                 type="text"
@@ -68,22 +68,7 @@ export default function Register() {
             </button>
           </div>
 
-          <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Correo
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              className="w-full p-2 rounded-md bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="mb-4">
+1          <div className="mb-4">
             <label
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 mb-1"
