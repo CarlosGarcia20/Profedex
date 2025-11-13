@@ -103,7 +103,7 @@ export default function Login() {
 				<footer 
 					className="mt-5 p-2 text-center"
 				>
-					Versión: 1.0 - Despliegue Manual
+					Versión: 1.1 - Despliegue Automático CI/CD Funcional
 				</footer>
 			</div>
 		</div>
