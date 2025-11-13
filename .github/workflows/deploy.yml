@@ -40,12 +40,12 @@ jobs:
           strip_components: 1 # Para que no copie la carpeta 'build' sino su contenido
 
       # Paso 5: Reiniciar Nginx (Opcional, si es necesario)
-      - name: Restart Nginx
-        uses: appleboy/ssh-action@v1.0.1
-        with:
-          host: ${{ secrets.SSH_HOST_AWS }}
-          username: ${{ secrets.SSH_USER_AWS }}
-          key: ${{ secrets.SSH_PRIVATE_KEY_AWS }}
-          port: 22
-          script: |
-            sudo systemctl restart nginx
+      # - name: Restart Nginx
+      #   uses: appleboy/ssh-action@v1.0.1
+      #   with:
+      #     host: ${{ secrets.SSH_HOST_AWS }}
+      #     username: ${{ secrets.SSH_USER_AWS }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY_AWS }}
+      #     port: 22
+      #     script: |
+      #       sudo systemctl restart nginx
