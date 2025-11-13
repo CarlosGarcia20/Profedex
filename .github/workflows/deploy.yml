@@ -35,7 +35,7 @@ jobs:
           username: ${{ secrets.SSH_USER_AWS }}
           key: ${{ secrets.SSH_PRIVATE_KEY_AWS }}
           port: 22
-          source: "build/" # La carpeta que s e construye
+          source: "dist/" # La carpeta que se construye
           target: "/var/www/html/" # El destino
           strip_components: 1 # Para que no copie la carpeta 'build' sino su contenido
 
