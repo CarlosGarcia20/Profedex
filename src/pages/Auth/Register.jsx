@@ -179,6 +179,22 @@ export default function Register() {
 						)}
 					</div>
 
+					{/* --- GRUYPO --- */}
+					<div className="mb-4">
+						<label 
+							htmlFor=""
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Grupo:
+						</label>
+						<select 
+							className="w-full p-2 rounded-md bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+							disabled={!isValidNickname}
+						>
+							<option value={"-1"}>Selecciona un grupo</option>
+						</select>
+					</div>
+
 					{/* --- NOMBRE --- */}
 					<div className="mb-4">
 						<label
@@ -192,7 +208,7 @@ export default function Register() {
 							id="fullName"
 							name="fullName"
 							className="w-full p-2 rounded-md bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-							disabled={!isValidNickname} // 👈 Se habilita si el nickname es válido
+							disabled={!isValidNickname}
 							onChange={(e) => setFullName(e.target.value)}
 							value={fullName}
 							required
@@ -212,7 +228,7 @@ export default function Register() {
 							id="password"
 							name="password"
 							className="w-full p-2 rounded-md bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-							disabled={!isValidNickname} // 👈 Se habilita si el nickname es válido
+							disabled={!isValidNickname}
 							onChange={(e) => setPassword(e.target.value)}
 							value={password}
 							required
@@ -232,7 +248,7 @@ export default function Register() {
 							id="confirmPassword"
 							name="confirmPassword"
 							className="w-full p-2 rounded-md bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-							disabled={!isValidNickname} // 👈 Se habilita si el nickname es válido
+							disabled={!isValidNickname}
 							onChange={(e) => setConfirmPassword(e.target.value)}
 							value={confirmPassword}
 							required
@@ -253,7 +269,7 @@ export default function Register() {
 						<button
 							type="submit"
 							className="bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800 transition duration-300 disabled:bg-gray-400"
-							disabled={!isValidNickname} // 👈 Se habilita si el nickname es válido
+							disabled={!isValidNickname}
 						>
 							Registrarse
 						</button>
