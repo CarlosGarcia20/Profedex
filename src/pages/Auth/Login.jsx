@@ -86,24 +86,11 @@ export default function Login() {
 
 					<hr className="border-gray-400 my-4" />
 
-					<div className="text-center">
-						<a
-							href="#"
-							onClick={(e) => {
-								e.preventDefault();
-								navigate("/register");
-							}}
-							className="text-sm text-blue-900 underline hover:text-blue-950"
-						>
-							Registrarme
-						</a>
-					</div>
-
 				</form>
 				<footer 
 					className="mt-5 p-2 text-center"
 				>
-					Versión: 1.2 - Despliegue Automático CI/CD Funcional
+					Versión: 1.1 - Despliegue Automático CI/CD Funcional
 				</footer>
 			</div>
 		</div>
