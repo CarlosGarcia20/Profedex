@@ -17,6 +17,7 @@ import HomeTeacher from './pages/Common/Home/Home-Teacher'
 import CommunityContent from './pages/Common/Community/CommunityContent'
 import AdminLayout from './layouts/AdminLayout';
 import AdminUsers from './pages/admin/Users';
+import AdminSubjects from './pages/admin/Subjects';
 
 const root = createRoot(document.getElementById('root'))
 
@@ -58,7 +59,7 @@ root.render(
 						
 						{/* <Route index element= /> */}
 						<Route path='users' element={<AdminUsers />} />
-					
+						<Route path='subjects' element={<AdminSubjects />} />
 					</Route>
 
 				</Route>
