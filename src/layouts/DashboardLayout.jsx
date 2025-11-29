@@ -1,19 +1,8 @@
 import { Outlet } from "react-router-dom";
 import Header from "../components/header/Header";
 import Sidebar from "../components/sidebar/Sidebar";
-import { useState } from "react";
 
 export default function DashboardLayout() {
-	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-	const openSidebar = () => {
-		setIsSidebarOpen(true);
-	};
-
-	const closeSidebar = () => {
-		setIsSidebarOpen(false);
-	};
-
 	return (
 		<div className="flex flex-col h-screen">
 			{/* Header arriba */}
