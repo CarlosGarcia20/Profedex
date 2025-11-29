@@ -2,6 +2,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
+import { Toaster } from 'react-hot-toast';
+
+import { ProtectedRoute } from './components/protectedRoutes/protected';
 
 import DashboardLayout from './layouts/DashboardLayout'
 import Login from './pages/Auth/Login'
@@ -12,44 +15,68 @@ import MaestroP from './pages/Common/Profiles/MaestroP'
 import Equipo from './pages/Common/Equipo/Equipo'
 import HomeTeacher from './pages/Common/Home/Home-Teacher'
 import CommunityContent from './pages/Common/Community/CommunityContent'
+import AdminPanel from './pages/admin/Admin'
+import AdminLayout from './layouts/AdminLayout';
 
 const root = createRoot(document.getElementById('root'))
 
-// root.render(
-//   <StrictMode>
-//     <BrowserRouter>
-//       <Routes>
-//         <Route path="/" element={<Navigate to="/login" />} />
-//         <Route path="/login" element={<Login />} />
-//         <Route path="/register" element={<Register />} />
-//         <Route path="/student" element={<Home />} />
-//         <Route path="/student/profile" element={<AlumnoP />} />
-//         <Route path="/student/team" element={<Equipo />} />
-//         <Route path="/teacher" element={<HomeTeacher />} />
-//         <Route path="/teacher/profile" element={<MaestroP />} />
-// 		<Route path="/community" element={<CommunityContent />} />
-//       </Routes>
-//     </BrowserRouter>
-//   </StrictMode>
-// )
-
 root.render(
-	<BrowserRouter>
-		<Routes>
-			{/* Public Routes */}
-			<Route path="/" element={<Navigate to="/login" />} />
-			<Route path="/login" element={<Login />} />
-			<Route path="/register" element={<Register />} />
+	<StrictMode>
+		<Toaster
+			position="top-center"
+			toastOptions={{
+				style: {
+					background: '#313141',
+					color: '#e5e7eb',
+					border: '1px solid #52525a',
+				},
+				success: {
+					iconTheme: {
+						primary: '#0ba600',
+						secondary: '#413133',
+					},
+				},
+				error: {
+					iconTheme: {
+						primary: '#ef4444',
+						secondary: '#ffffff',
+					},
+				},
+			}}
+		/>
 
-			{/* Routes With Layout */}
-			<Route path='/' element={<DashboardLayout />}>
-				<Route path="/student" element={<Home />} />
-				<Route path="/student/profile" element={<AlumnoP />} />
-				<Route path="/student/team" element={<Equipo />} />
-				<Route path="/teacher" element={<HomeTeacher />} />
-				<Route path="/teacher/profile" element={<MaestroP />} />
-				<Route path="/community" element={<CommunityContent />} />
-			</Route>
-		</Routes>
-	</BrowserRouter>
+		<BrowserRouter>
+			<Routes>
+				{/* Public Routes */}
+				<Route path="/" element={<Navigate to="/login" />} />
+				<Route path="/login" element={<Login />} />
+				<Route path="/register" element={<Register />} />
+
+				{/* Admin Route */}
+				<Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+					<Route path='/admin' element={<AdminLayout />}>
+						
+						{/* <Route index element= /> */}
+					
+					</Route>
+
+				</Route>
+
+				{/* Routes With Layout */}
+				<Route path='/' element={<DashboardLayout />}>
+					{/* Student Routes */}
+					<Route path="/student" element={<Home />} />
+					<Route path="/student/profile" element={<AlumnoP />} />
+					<Route path="/student/team" element={<Equipo />} />
+					
+					{/* Teacher Routes */}
+					<Route path="/teacher" element={<HomeTeacher />} />
+					<Route path="/teacher/profile" element={<MaestroP />} />
+					
+					<Route path="/community" element={<CommunityContent />} />
+				</Route>
+			</Routes>
+		</BrowserRouter>
+
+	</StrictMode>
 );
