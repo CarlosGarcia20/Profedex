@@ -1,56 +1,81 @@
 import { useState } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import profedex from "../../assets/images/Profedex.png";
 import api from "../../api/axios";
-import axios from "axios";
+
+import toast from 'react-hot-toast';
+
+const ROLE_PATHS = {
+	'1': 'admin',
+	'2': 'teacher',
+	'3': 'student'
+};
 
 export default function Login() {
 	const [user, setUser] = useState("");
 	const [password, setPassword] = useState("");
-	const [error, setError] = useState(null);
-	const [loading, setLoading] = useState(false);
-
-	// const navigate = useNavigate();
+	const navigate = useNavigate();
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setError(null);
-		setLoading(true);
+
+		const loginPromise = api.post('auth', {
+			username: user,
+			password: password
+		});
+
+		toast.promise(
+			loginPromise,
+			{
+				loading: 'Verificando credenciales...',
+				success: (data) => {
+					const username = data.data.user.nickname;
+					return `¡Bienvenido de nuevo, ${username}!`;
+				},
+				error: (err) => {
+					const responseData = err.response?.data;
+
+					if (responseData?.errors) {
+						const errorFields = Object.keys(responseData.errors);
+
+						const firstField = errorFields[0];
+
+						const firstErrorMessage = responseData.errors[firstField][0];
+
+						return firstErrorMessage;
+					}
+
+					return responseData?.message || 'Error al iniciar sesión';
+				},
+			}
+		);
 
 		try {
-			const response = await axios.post('http://localhost:4000/auth/', {
-				username: user,
-				password: password
-			});
+			const response = await loginPromise;
 
-			console.log(response);
+			// 1. Extraemos los datos (asegúrate que el backend envíe idRol)
+			const { idRol, nickname } = response.data.user;
 
-			const { nickname, name } = response.data.user;
+			// 2. Buscamos la ruta usando nuestro diccionario
+			// Convertimos a string por si el backend manda número (1 vs "1")
+			const rolePath = ROLE_PATHS[String(idRol)];
 
-			// Guardamos la respuesta real del servidor
-			localStorage.setItem("isLoggedIn", "true");
-			// localStorage.setItem("role", role);
-			localStorage.setItem("username", nickname);
-			localStorage.setItem("name", name);
-
-			// Redirección dinámica basada en la respuesta del servidor
-			// navigate(`/${role}`);
-
-		} catch (err) {
-			console.error("Error en login:", err);
-
-			// Manejo de errores de Axios
-			if (err.response) {
-				// El servidor respondió con un código de error (ej. 401, 400)
-				setError(err.response.data.message || "Credenciales incorrectas");
-			} else if (err.request) {
-				// No hubo respuesta del servidor (backend caído)
-				setError("No se pudo conectar con el servidor");
-			} else {
-				setError("Ocurrió un error inesperado");
+			// VALIDACIÓN DE SEGURIDAD
+			if (!rolePath) {
+				toast.error("Error: Rol de usuario no reconocido");
+				return; // Detenemos todo si el rol es raro (ej: rol 99)
 			}
-		} finally {
-			setLoading(false);
+
+			// 3. Guardamos en LocalStorage
+			localStorage.setItem("isLoggedIn", "true");
+			localStorage.setItem("nickname", nickname);
+			// Guardamos el 'rolePath' (student/teacher) para usarlo en la UI del frontend
+			localStorage.setItem("role", rolePath);
+
+			// 4. Redirección Mágica
+			navigate(`/${rolePath}`);
+		} catch (error) {
+			// console.log("error: " + error);
 		}
 	};
 
@@ -66,13 +91,6 @@ export default function Login() {
 				</div>
 
 				<form onSubmit={handleSubmit}>
-					{/* Mensaje de Error Visual */}
-					{error && (
-						<div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 text-sm rounded text-center">
-							{error}
-						</div>
-					)}
-
 					<div className="mb-4">
 						<label
 							htmlFor="username"
@@ -110,13 +128,9 @@ export default function Login() {
 					<div className="col-mb-6 mb-5">
 						<button
 							type="submit"
-							disabled={loading} // Deshabilitamos si está cargando
-							className={`w-full text-white py-2 px-4 rounded-md transition duration-300 ${loading
-									? "bg-blue-400 cursor-not-allowed"
-									: "bg-blue-800 hover:bg-blue-700"
-								}`}
+							className={"w-full text-white py-2 px-4 rounded-md transition duration-300 bg-blue-800 hover:bg-blue-700"}
 						>
-							{loading ? "Verificando..." : "Acceder"}
+							Acceder
 						</button>
 					</div>
 
