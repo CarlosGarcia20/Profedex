@@ -20,6 +20,7 @@ import AdminUsers from './pages/admin/Users';
 import AdminSubjects from './pages/admin/Subjects';
 import AdminMajors from './pages/admin/Major';
 import AdminDashboard from './pages/admin/Dashboard';
+import AdminGroups from './pages/admin/Group';
 
 const root = createRoot(document.getElementById('root'))
 
@@ -62,6 +63,7 @@ root.render(
 						{/* <Route index element= /> */}
 						<Route path='' element={<AdminDashboard />} />
 						<Route path='users' element={<AdminUsers />} />
+						<Route path='groups' element={<AdminGroups />} />
 						<Route path='majors' element={<AdminMajors />} />
 						<Route path='subjects' element={<AdminSubjects />} />
 					</Route>
