@@ -63,8 +63,8 @@ root.render(
 						{/* <Route index element= /> */}
 						<Route path='' element={<AdminDashboard />} />
 						<Route path='users' element={<AdminUsers />} />
-						<Route path='groups' element={<AdminGroups />} />
 						<Route path='majors' element={<AdminMajors />} />
+						<Route path='groups' element={<AdminGroups />} />
 						<Route path='subjects' element={<AdminSubjects />} />
 					</Route>
 
