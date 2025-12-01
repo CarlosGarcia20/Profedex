@@ -7,7 +7,6 @@ const ROLE_CONFIG = {
     1: { label: "Administrador", css: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
     2: { label: "Maestro", css: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
     3: { label: "Alumno", css: "bg-green-500/10 text-green-400 border-green-500/20" },
-    // Default por si llega un ID raro
     default: { label: "Desconocido", css: "bg-gray-500/10 text-gray-400 border-gray-500/20" }
 };
 
@@ -65,7 +64,7 @@ export default function AdminUsers() {
                             const roleData = ROLE_CONFIG[user.idrol] || ROLE_CONFIG.default;
 
                             return (
-                                <tr key={user.id} className="hover:bg-white/5 transition-colors">
+                                <tr key={user.userid} className="hover:bg-white/5 transition-colors">
                                     <td className="px-6 py-4 opacity-80">{user.userid}</td>
                                     <td className="px-6 py-4 font-medium">{user.name}</td>
                                     <td className="px-6 py-4 font-medium">{user.nickname}</td>
