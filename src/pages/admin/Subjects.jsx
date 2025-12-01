@@ -1,22 +1,11 @@
-import Modal from 'react-modal';
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
-import { IoClose, IoPencil, IoTrash } from 'react-icons/io5';
+import { IoPencil, IoTrash } from 'react-icons/io5';
 import { showAlertConfirm } from '../../utils/alerts';
+import BaseModal from '../../components/ui/BaseModal';
 
-Modal.setAppElement('#root');
-
-const customStyles = {
-    overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: 1000 },
-    content: {
-        top: '50%', left: '50%', right: 'auto', bottom: 'auto', marginRight: '-50%',
-        transform: 'translate(-50%, -50%)', backgroundColor: 'transparent', border: 'none', padding: 0,
-        maxWidth: '600px', width: '95%'
-    },
-};
-
-const initialFormState = {
+export const initialFormState = {
     name: '',
     code: '',
     description: '',
@@ -248,176 +237,159 @@ export default function AdminSubjects() {
                 </div>
             </div>
 
-            <Modal
+            <BaseModal
                 isOpen={modalIsOpen}
-                onRequestClose={closeModal}
-                style={customStyles}
-                contentLabel="Materia Modal"
+                onClose={closeModal}
+                title={ editingSubject ? 'Editar Materia': 'Nueva Materia' }
+                subtitle={ editingSubject ? `Editando: ${editingSubject.name}` : 'Ingresa los datos de la materia.' }
             >
-                <div className="bg-white dark:bg-[#313141] text-gray-800 dark:text-white p-6 rounded-xl border border-gray-200 dark:border-gray-600 shadow-2xl relative transition-all">
+                <form onSubmit={handleSubmit} className="space-y-4">
 
-                    <button
-                        onClick={closeModal}
-                        className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors"
-                    >
-                        <IoClose size={24} />
-                    </button>
-
-                    <h2 className="text-xl font-bold mb-1 text-yellow-600 dark:text-yellow-400">
-                        {editingSubject ? 'Editar Materia' : 'Nueva Materia'}
-                    </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                        {editingSubject ? `Editando: ${editingSubject.name}` : 'Ingresa los datos de la materia.'}
-                    </p>
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Código / Clave</label>
-                                <input
-                                    type="text"
-                                    name="code"
-                                    value={formData.code}
-                                    onChange={handleInputChange}
-                                    className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                    placeholder="Ej: 1210"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Año del Plan</label>
-                                <input
-                                    type="number"
-                                    name="plan_year"
-                                    value={formData.plan_year}
-                                    onChange={handleInputChange}
-                                    className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                    placeholder="Ej: 2024"
-                                    required
-                                />
-                            </div>
-                        </div>
-
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Nombre de la Materia</label>
+                            <label className="block text-sm font-medium mb-1">Código / Clave</label>
                             <input
                                 type="text"
-                                name="name"
-                                value={formData.name}
+                                name="code"
+                                value={formData.code}
                                 onChange={handleInputChange}
                                 className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                placeholder="Ej: Cálculo Diferencial"
-                                autoComplete='off'
+                                placeholder="Ej: 1210"
                                 required
                             />
                         </div>
-
                         <div>
-                            <label className='block text-sm font-medium mb-1'>Descripción</label>
-                            <textarea
-                                typeof='text'
-                                name='description'
-                                value={formData.description}
-                                onChange={handleInputChange}
-                                className='w-full resize-none bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500'
-                                placeholder="Descripción de la materia (opcional)"
-                                rows={3}
-                            >
-                            </textarea>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Carrera / Especialidad</label>
-                            <select
-                                name='major_id'
-                                value={formData.major_id}
-                                onChange={handleInputChange}
-                                className='w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-gray-900 dark:text-white'
-                                required
-                            >
-                                <option value="-1">Selecciona una carrera</option>
-                                {careers.map((career) => (
-                                    <option key={career.major_id} value={career.major_id}>
-                                        {career.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Créditos</label>
-                                <input
-                                    type="number"
-                                    name="credits"
-                                    value={formData.credits}
-                                    onChange={handleInputChange}
-                                    className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                    placeholder="Ej: 8"
-                                    min={1}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Horas</label>
-                                <input
-                                    type="number"
-                                    name="hours"
-                                    value={formData.hours}
-                                    onChange={handleInputChange}
-                                    className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                    placeholder="Ej: 40"
-                                    min={1}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium mb-1">N° Semestre al que pertenece</label>
+                            <label className="block text-sm font-medium mb-1">Año del Plan</label>
                             <input
                                 type="number"
-                                name="semester"
-                                value={formData.semester}
+                                name="plan_year"
+                                value={formData.plan_year}
                                 onChange={handleInputChange}
                                 className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                placeholder="Ej: 2024"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Nombre de la Materia</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                            placeholder="Ej: Cálculo Diferencial"
+                            autoComplete='off'
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className='block text-sm font-medium mb-1'>Descripción</label>
+                        <textarea
+                            typeof='text'
+                            name='description'
+                            value={formData.description}
+                            onChange={handleInputChange}
+                            className='w-full resize-none bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500'
+                            placeholder="Descripción de la materia (opcional)"
+                            rows={3}
+                        >
+                        </textarea>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Carrera / Especialidad</label>
+                        <select
+                            name='major_id'
+                            value={formData.major_id}
+                            onChange={handleInputChange}
+                            className='w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-gray-900 dark:text-white'
+                            required
+                        >
+                            <option value="-1">Selecciona una carrera</option>
+                            {careers.map((career) => (
+                                <option key={career.major_id} value={career.major_id}>
+                                    {career.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Créditos</label>
+                            <input
+                                type="number"
+                                name="credits"
+                                value={formData.credits}
+                                onChange={handleInputChange}
+                                className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                placeholder="Ej: 8"
                                 min={1}
                                 required
                             />
                         </div>
-
                         <div>
-                            <label className="block text-sm font-medium mb-1">Estatus</label>
-                            <select
-                                name="active"
-                                value={formData.active}
+                            <label className="block text-sm font-medium mb-1">Horas</label>
+                            <input
+                                type="number"
+                                name="hours"
+                                value={formData.hours}
                                 onChange={handleInputChange}
                                 className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                            >
-                                <option value={'S'}>Activa</option>
-                                <option value={'N'}>Inactiva (Baja Temporal)</option>
-                            </select>
+                                placeholder="Ej: 40"
+                                min={1}
+                                required
+                            />
                         </div>
+                    </div>
 
-                        <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-200 dark:border-white/10">
-                            <button
-                                type="button"
-                                onClick={closeModal}
-                                className="px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                type="submit"
-                                className="px-6 py-2 rounded-lg bg-yellow-500 text-black font-bold hover:bg-yellow-400 transition-colors shadow-lg"
-                            >
-                                {editingSubject ? 'Actualizar Materia' : 'Guardar Materia'}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </Modal>
+                    <div>
+                        <label className="block text-sm font-medium mb-1">N° Semestre al que pertenece</label>
+                        <input
+                            type="number"
+                            name="semester"
+                            value={formData.semester}
+                            onChange={handleInputChange}
+                            className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                            min={1}
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Estatus</label>
+                        <select
+                            name="active"
+                            value={formData.active}
+                            onChange={handleInputChange}
+                            className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                        >
+                            <option value={'S'}>Activa</option>
+                            <option value={'N'}>Inactiva (Baja Temporal)</option>
+                        </select>
+                    </div>
+
+                    <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-200 dark:border-white/10">
+                        <button
+                            type="button"
+                            onClick={closeModal}
+                            className="px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-6 py-2 rounded-lg bg-yellow-500 text-black font-bold hover:bg-yellow-400 transition-colors shadow-lg"
+                        >
+                            {editingSubject ? 'Actualizar Materia' : 'Guardar Materia'}
+                        </button>
+                    </div>
+                </form>
+            </BaseModal>
         </div>
     );
 }
