@@ -18,6 +18,8 @@ import CommunityContent from './pages/Common/Community/CommunityContent'
 import AdminLayout from './layouts/AdminLayout';
 import AdminUsers from './pages/admin/Users';
 import AdminSubjects from './pages/admin/Subjects';
+import AdminMajors from './pages/admin/Major';
+import AdminDashboard from './pages/admin/Dashboard';
 
 const root = createRoot(document.getElementById('root'))
 
@@ -58,7 +60,9 @@ root.render(
 					<Route path='/admin' element={<AdminLayout />}>
 						
 						{/* <Route index element= /> */}
+						<Route path='' element={<AdminDashboard />} />
 						<Route path='users' element={<AdminUsers />} />
+						<Route path='majors' element={<AdminMajors />} />
 						<Route path='subjects' element={<AdminSubjects />} />
 					</Route>
 
