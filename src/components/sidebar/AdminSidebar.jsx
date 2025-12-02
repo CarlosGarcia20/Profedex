@@ -8,7 +8,7 @@ import { APP_NAME } from "../../config/constants";
 
 // ICONOS
 import { MdGroup, MdSpaceDashboard } from "react-icons/md";
-import { FaUser, FaBook, FaBars, FaBookOpen, FaBookReader, FaUniversity, FaChevronDown, FaChevronRight } from "react-icons/fa";
+import { FaUser, FaBook, FaBars, FaBookOpen, FaBookReader, FaUniversity, FaChevronDown, FaChevronRight, FaUserGraduate, FaUserTie, FaUserPlus } from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
 
 export default function AdminSidebar() {
@@ -50,9 +50,16 @@ export default function AdminSidebar() {
             <nav className="flex-1 px-2 md:px-4 py-6 space-y-2 overflow-y-auto">
 
                 <AdminLink to="/admin" end icon={<MdSpaceDashboard />} label="Dashboard" />
-                <AdminLink to="/admin/users" icon={<FaUser />} label="Usuarios" />
 
-                {/* --- GRUPO ESCOLAR (NUEVO) --- */}
+                {/* --- GRUPO ESCOLAR --- */}
+                <SidebarGroup icon={<FaUser />} label="Gestión de usuarios" >
+                    <AdminLink to="/admin/users" icon={<FaUserPlus />} label="Usuarios" />
+                    <AdminLink to="/admin/students" icon={<FaUserGraduate />} label="Estudiantes" />
+                    <AdminLink to="/admin/teachers" icon={<FaUserTie />} label="Profesores" />
+
+                </SidebarGroup> 
+
+                {/* --- GRUPO ESCOLAR --- */}
                 <SidebarGroup icon={<FaUniversity />} label="Gestión Escolar">
                     <AdminLink to='/admin/majors' icon={<FaBars />} label="Carreras" isChild />
                     <AdminLink to='/admin/groups' icon={<MdGroup />} label="Grupos" isChild />
@@ -68,7 +75,7 @@ export default function AdminSidebar() {
                 <div className="flex flex-col md:flex-row items-center md:justify-between gap-3 md:gap-0">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center shadow-md border border-white/20 bg-gray-700/50 overflow-hidden">
-                            <img src="https://api.github.com/users/CarlosGarcia20.png" alt="User" />
+                            <img src="../../public/user-svgrepo-com.svg" alt="User" />
                         </div>
                         <div className="hidden md:block flex-1 min-w-0">
                             <p className="text-sm font-medium truncate text-gray-950 dark:text-yellow-400">Carlos Garcia</p>

@@ -17,10 +17,12 @@ import HomeTeacher from './pages/Common/Home/Home-Teacher'
 import CommunityContent from './pages/Common/Community/CommunityContent'
 import AdminLayout from './layouts/AdminLayout';
 import AdminUsers from './pages/admin/Users';
-import AdminSubjects from './pages/admin/Subjects';
-import AdminMajors from './pages/admin/Major';
+import AdminSubjects from './pages/admin/school/Subjects';
+import AdminMajors from './pages/admin/school/Major';
 import AdminDashboard from './pages/admin/Dashboard';
-import AdminGroups from './pages/admin/Group';
+import AdminGroups from './pages/admin/school/Group';
+import AdminUnits from './pages/admin/school/Units';
+import AdminTopics from './pages/admin/school/Topics';
 
 const root = createRoot(document.getElementById('root'))
 
@@ -62,10 +64,17 @@ root.render(
 						
 						{/* <Route index element= /> */}
 						<Route path='' element={<AdminDashboard />} />
+						
+						{/* Rutas para la gestión de usuarios */}
 						<Route path='users' element={<AdminUsers />} />
+						<Route path='users/students' element={<AdminUsers />} />
+
+						{/* Rutas para la gestión escolar */ }
 						<Route path='majors' element={<AdminMajors />} />
 						<Route path='groups' element={<AdminGroups />} />
 						<Route path='subjects' element={<AdminSubjects />} />
+						<Route path='units' element={<AdminUnits />} />
+						<Route path='topics' element={<AdminTopics />} />
 					</Route>
 
 				</Route>
