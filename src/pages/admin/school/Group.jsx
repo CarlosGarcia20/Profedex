@@ -1,9 +1,9 @@
 import Modal from 'react-modal';
 import { useEffect, useState } from "react";
-import api from "../../api/axios";
+import api from "../../../api/axios";
 import toast from "react-hot-toast";
 import { IoClose, IoPencil, IoTrash } from 'react-icons/io5';
-import { showAlertConfirm } from '../../utils/alerts';
+import { showAlertConfirm } from '../../../utils/alerts';
 
 Modal.setAppElement('#root');
 

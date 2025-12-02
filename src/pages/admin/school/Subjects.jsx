@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import api from "../../api/axios";
+import api from "../../../api/axios";
 import toast from "react-hot-toast";
 import { IoPencil, IoTrash } from 'react-icons/io5';
-import { showAlertConfirm } from '../../utils/alerts';
-import BaseModal from '../../components/ui/BaseModal';
+import { showAlertConfirm } from '../../../utils/alerts';
+import BaseModal from '../../../components/ui/BaseModal';
 
-export const initialFormState = {
+const initialFormState = {
     name: '',
     code: '',
     description: '',
