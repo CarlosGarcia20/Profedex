@@ -175,7 +175,7 @@ export default function AdminUsers() {
 
 					<div className="w-full md:w-1/3 flex justify-center items-center gap-3">
 						<label className="text-sm font-bold text-gray-600 dark:text-gray-300 whitespace-nowrap">
-							Estado:
+							Rol:
 						</label>
 						<div className="relative">
 							<select
@@ -183,7 +183,7 @@ export default function AdminUsers() {
 								onChange={(e) => setFilterRoles(e.target.value)}
 								className='appearance-none bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-sm pl-4 pr-8 py-2 rounded-lg shadow-md transition-all cursor-pointer border-none outline-none focus:ring-2 focus:ring-yellow-600 text-center'
 							>
-								<option value="-1">Todas</option>
+								<option value="-1">Todos</option>
 								{roles.map((role) => (
 									<option key={role.idrol} value={role.idrol}>
 										{role.name}
@@ -269,8 +269,8 @@ export default function AdminUsers() {
 			<BaseModal
 				isOpen={modalIsOpen}
 				onClose={closeModal}
-				title={editingUser ? 'Editar Materia' : 'Crear Materia'}
-				subtitle={editingUser ? `Editando ${editingUser.name}` : 'Ingresa los datos de la materia.'}	
+				title={editingUser ? 'Editar Usuario' : 'Crear Usuario'}
+				subtitle={editingUser ? `Editando a ${editingUser.name}` : 'Ingresa los datos del usuario.'}	
 			>
 				<form onSubmit={handleSubmit} className='space-y-4'>
 					<div>
