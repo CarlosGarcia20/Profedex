@@ -53,26 +53,18 @@ export default function Login() {
 		try {
 			const response = await loginPromise;
 
-			// 1. Extraemos los datos (asegúrate que el backend envíe idRol)
 			const { idRol, nickname } = response.data.user;
 
-			// 2. Buscamos la ruta usando nuestro diccionario
-			// Convertimos a string por si el backend manda número (1 vs "1")
 			const rolePath = ROLE_PATHS[String(idRol)];
 
-			// VALIDACIÓN DE SEGURIDAD
 			if (!rolePath) {
 				toast.error("Error: Rol de usuario no reconocido");
-				return; // Detenemos todo si el rol es raro (ej: rol 99)
 			}
 
-			// 3. Guardamos en LocalStorage
 			localStorage.setItem("isLoggedIn", "true");
 			localStorage.setItem("nickname", nickname);
-			// Guardamos el 'rolePath' (student/teacher) para usarlo en la UI del frontend
 			localStorage.setItem("role", rolePath);
 
-			// 4. Redirección Mágica
 			navigate(`/${rolePath}`);
 		} catch (error) {
 			// console.log("error: " + error);
