@@ -14,6 +14,9 @@ import { IoLogOutOutline } from "react-icons/io5";
 export default function AdminSidebar() {
     const navigate = useNavigate();
 
+    const userName = localStorage.getItem('name');
+    const role = localStorage.getItem('role')
+
     const handleLogout = (e) => {
         if (e) e.preventDefault();
         showAlertConfirm("¿Cerrar sesión?").then(async (result) => {
@@ -78,8 +81,8 @@ export default function AdminSidebar() {
                             <img src="../../public/user-svgrepo-com.svg" alt="User" />
                         </div>
                         <div className="hidden md:block flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate text-gray-950 dark:text-yellow-400">Carlos Garcia</p>
-                            <p className="text-xs truncate opacity-70 font-bold text-gray-950 dark:text-yellow-400">Admin</p>
+                            <p className="text-sm font-medium truncate text-gray-950 dark:text-yellow-400"> {userName} </p>
+                            <p className="text-xs truncate opacity-70 font-bold text-gray-950 dark:text-yellow-400 capitalize"> {role} </p>
                         </div>
                     </div>
                     <ThemeToggle />

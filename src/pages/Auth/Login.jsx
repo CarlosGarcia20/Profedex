@@ -53,7 +53,7 @@ export default function Login() {
 		try {
 			const response = await loginPromise;
 
-			const { idRol, nickname } = response.data.user;
+			const { idRol, nickname, name } = response.data.user;
 
 			const rolePath = ROLE_PATHS[String(idRol)];
 
@@ -63,6 +63,7 @@ export default function Login() {
 
 			localStorage.setItem("isLoggedIn", "true");
 			localStorage.setItem("nickname", nickname);
+			localStorage.setItem("name", name);
 			localStorage.setItem("role", rolePath);
 
 			navigate(`/${rolePath}`);
