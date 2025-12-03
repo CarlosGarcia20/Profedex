@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../../api/axios";
 import toast from "react-hot-toast";
-import { IoPencil, IoTrash } from 'react-icons/io5';
+import { IoPencil, IoTrash, IoAdd } from 'react-icons/io5';
 import { showAlertConfirm } from "../../../utils/alerts";
 import BaseModal from "../../../components/ui/BaseModal";
 
@@ -9,27 +9,46 @@ const initialFormState = {
     subject_id: '',
     title: '',
     unit_number: '',
-    active: 'S',
+    active: 'S'
 };
+
+// Estado inicial de una unidad vacía
+const emptyUnit = { title: '', number: '', active: 'S' };
 
 export default function AdminUnits() {
     const [units, setUnits] = useState([]);
     const [subjects, setSubjects] = useState([]);
-    const [modalIsOpen, setIsOpen] = useState(false);
+    const [filterSubject, setFilterSubject] = useState("-1");
     const [filterStatus, setFilterStatus] = useState("-1");
+    const [modalIsOpen, setIsOpen] = useState(false);
 
     const [formData, setFormData] = useState(initialFormState);
     const [editingUnit, setEditingUnit] = useState(null);
 
-    const fetchUnits = () => {
-        const subjectsPromise = api.get('admin/subjects');
-        toast.promise(subjectsPromise, {
-            loading: 'Cargando materias...',
+    // 1. Estado para la Materia Seleccionada
+    const [selectedSubject, setSelectedSubject] = useState("-1");
+    
+    const [unitsList, setUnitsList] = useState([{ ...emptyUnit }]);
+
+    const fetchUnits = (subjectId) => {
+        if (!subjectId || subjectId === "-1") return;
+
+        const unitsPromise = api.get(`/admin/units/subjects/${subjectId}`);
+
+        toast.promise(unitsPromise, {
+            loading: 'Cargando unidades...',
             success: (response) => {
-                setSubjects(response.data.data);
-                return 'Datos actualizados';
+                setUnits(response.data.data);
+                return 'Unidades actualizadas';
             },
-            error: 'Error al cargar datos'
+            error: (err) => {
+                if (err.response?.status === 404) {
+                    setUnits([]);
+                    return "No hay unidades registradas para esta materia.";
+                }
+
+                return err.response?.data?.message || 'Error al cargar los datos';
+            }
         });
     };
 
@@ -41,22 +60,34 @@ export default function AdminUnits() {
             console.error("Error al cargar carreras", error);
         }
     };
-
+    
     useEffect(() => {
         fetchSubjects();
-        // fetchCareers();
-    }, []);
+        if (filterSubject !== "-1") {
+            fetchUnits(filterSubject);
+        } else {
+            setUnits([]);
+        }
+    }, [filterSubject]);
 
     const filteredSubjects = subjects.filter((subject) => {
         if (filterStatus === "-1") return true;
         return subject.active === filterStatus;
     });
 
-    // ABRIR PARA CREAR
+    // Al cerrar/abrir modal puedes resetear con copias también:
     function openModalAdd() {
         setFormData(initialFormState);
-        setEditingSubject(null);
+        setEditingUnit(null);
+        // iniciar unidades con una copia limpia
+        setUnitsList([{ ...emptyUnit }]);
         setIsOpen(true);
+    }
+
+    function closeModal() {
+        // opcional: limpiar antes de cerrar
+        setUnitsList([{ ...emptyUnit }]);
+        setIsOpen(false);
     }
 
     function openModalEdit(subject) {
@@ -71,11 +102,9 @@ export default function AdminUnits() {
             hours: subject.hours,
             semester: subject.semester
         });
-        setEditingSubject(subject);
+        setEditingUnit(subject);
         setIsOpen(true);
     }
-
-    function closeModal() { setIsOpen(false); }
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -109,21 +138,48 @@ export default function AdminUnits() {
     };
 
     const handleDelete = async (id) => {
-        showAlertConfirm("¿Eliminar la materia?", "Esta acción no se puede deshacer").then((result) => {
+        showAlertConfirm("¿Eliminar la unidad?", "Esta acción no se puede deshacer").then((result) => {
             if (result.isConfirmed) {
-                const deletePromise = api.delete(`admin/subjects/${id}`);
+                const deletePromise = api.delete(`admin/units/${id}`);
 
                 toast.promise(deletePromise, {
                     loading: 'Eliminando...',
                     success: () => {
-                        fetchSubjects();
-                        return 'Materia eliminada';
+                        fetchUnits(id);
+                        return 'Unidad eliminada';
                     },
                     error: 'Error al eliminar'
                 });
             }
         });
     };
+
+    const handleUnitChange = (index, field, value) => {
+        setUnitsList(prev => {
+            const updated = [...prev];
+            const row = { ...updated[index] };
+
+            row[field] = value;
+            updated[index] = row;
+            return updated;
+        });
+    };
+
+    const addUnitRow = () => {
+        setUnitsList(prev => [...prev, { ...emptyUnit }]);
+    };
+
+    const removeUnitRow = (index) => {
+        setUnitsList(prev => {
+            if (prev.length === 1) {
+                toast.error("Debes agregar al menos una unidad.");
+                return prev;
+            }
+            return prev.filter((_, i) => i !== index);
+        });
+    };
+
+    
 
     return (
         <div className="text-black dark:text-white">
@@ -145,11 +201,11 @@ export default function AdminUnits() {
                             </label>
                             <div className="relative w-full md:w-auto">
                                 <select
-                                    // value={filterSubject} <--- Asegúrate de usar un estado diferente para Materia
-                                    // onChange={(e) => setFilterSubject(e.target.value)}
+                                    value={filterSubject}
+                                    onChange={(e) => setFilterSubject(e.target.value)}
                                     className='w-full md:w-64 appearance-none bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-sm pl-4 pr-8 py-2 rounded-lg shadow-md transition-all cursor-pointer border-none outline-none focus:ring-2 focus:ring-yellow-600 text-center text-ellipsis overflow-hidden'
                                 >
-                                    <option value="-1" disabled>Selecciona una materia</option>
+                                    <option value="-1">Selecciona una materia</option>
                                     {subjects.map((subject) => (
                                         <option key={subject.subject_id} value={subject.subject_id}>
                                             {subject.name}
@@ -186,7 +242,6 @@ export default function AdminUnits() {
 
                     </div>
 
-                    {/* 3. BOTÓN (Grande en móvil, normal en PC) */}
                     <div className="w-full lg:w-auto flex justify-center lg:justify-end">
                         <button
                             onClick={openModalAdd}
@@ -198,9 +253,7 @@ export default function AdminUnits() {
 
                 </div>
 
-                {/* TABLA CON SCROLL */}
                 <div className="overflow-x-auto">
-                    {/* min-w-[800px] fuerza el scroll en pantallas pequeñas para que no se rompa la tabla */}
                     <table className="w-full text-left text-sm text-gray-600 dark:text-gray-300 min-w-[800px]">
                         <thead className="bg-gray-200 dark:bg-black/20 uppercase text-xs font-semibold">
                             <tr>
@@ -212,149 +265,164 @@ export default function AdminUnits() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 dark:divide-white/5 bg-white dark:bg-[#313141]">
-                            {/* Tus filas irían aquí */}
+                            {units.length > 0 ? (
+                                units.map((unit) => (
+                                    <tr
+                                        key={unit.unit_id}
+                                        className="hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                                    >
+                                        <td className="px-6 py-4 font-mono text-xs opacity-70"> {unit.subject} </td>
+                                        <td className="px-6 py-4 font-mono text-xs opacity-70"> {unit.title} </td>
+                                        <td className="px-6 py-4 font-mono text-xs opacity-70"> {unit.unit_number} </td>
+                                        <td className="px-6 py-4">
+                                            <span
+                                                className={`px-2 py-1 rounded text-xs font-bold ${unit.active == 'S' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}
+                                            >
+                                                {unit.active == 'S' ? 'Activa' : 'Inactiva'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => openModalEdit(unit)}
+                                                    className="p-2 rounded-lg text-blue-600 dark:text-yellow-400 hover:bg-blue-50 dark:hover:bg-yellow-400/10 transition-all active:scale-95"
+                                                    title="Editar materia"
+                                                >
+                                                    <IoPencil size={20} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(unit.unit_id)}
+                                                    className="p-2 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95"
+                                                    title="Eliminar materia"
+                                                >
+                                                    <IoTrash size={20} />
+                                                </button>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="px-6 py-12 text-center opacity-50 italic">
+                                        No hay unidades disponibles
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            {/* <BaseModal
+            <BaseModal
                 isOpen={modalIsOpen}
                 onClose={closeModal}
-                title={editingSubject ? 'Editar Materia' : 'Nueva Materia'}
-                subtitle={editingSubject ? `Editando: ${editingSubject.name}` : 'Ingresa los datos de la materia.'}
+                title={'Agregar Unidades'}
+                subtitle={'Ingresa los datos de las unidades para la materia'}
             >
-                <form onSubmit={handleSubmit} className="space-y-4">
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Código / Clave</label>
-                            <input
-                                type="text"
-                                name="code"
-                                value={formData.code}
-                                onChange={handleInputChange}
-                                className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                placeholder="Ej: 1210"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Año del Plan</label>
-                            <input
-                                type="number"
-                                name="plan_year"
-                                value={formData.plan_year}
-                                onChange={handleInputChange}
-                                className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                placeholder="Ej: 2024"
-                                required
-                            />
-                        </div>
-                    </div>
+                <form onSubmit={handleSubmit} className="space-y-6">
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">Nombre de la Materia</label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                            className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                            placeholder="Ej: Cálculo Diferencial"
-                            autoComplete='off'
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className='block text-sm font-medium mb-1'>Descripción</label>
-                        <textarea
-                            typeof='text'
-                            name='description'
-                            value={formData.description}
-                            onChange={handleInputChange}
-                            className='w-full resize-none bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500'
-                            placeholder="Descripción de la materia (opcional)"
-                            rows={3}
-                        >
-                        </textarea>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Carrera / Especialidad</label>
+                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                            Materia
+                        </label>
                         <select
-                            name='major_id'
-                            value={formData.major_id}
-                            onChange={handleInputChange}
+                            value={selectedSubject}
+                            onChange={(e) => setSelectedSubject(e.target.value)}
                             className='w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-gray-900 dark:text-white'
+                            name="subject"
                             required
                         >
-                            <option value="-1">Selecciona una carrera</option>
-                            {careers.map((career) => (
-                                <option key={career.major_id} value={career.major_id}>
-                                    {career.name}
+                            <option value="-1">Selecciona una materia</option>
+                            {subjects.map((subject) => (
+                                <option key={subject.subject_id} value={subject.subject_id}>
+                                    {subject.name}
                                 </option>
                             ))}
                         </select>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Créditos</label>
-                            <input
-                                type="number"
-                                name="credits"
-                                value={formData.credits}
-                                onChange={handleInputChange}
-                                className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                placeholder="Ej: 8"
-                                min={1}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Horas</label>
-                            <input
-                                type="number"
-                                name="hours"
-                                value={formData.hours}
-                                onChange={handleInputChange}
-                                className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                placeholder="Ej: 40"
-                                min={1}
-                                required
-                            />
-                        </div>
+                    <div className="border-t border-gray-200 dark:border-white/10 my-4"></div>
+
+                    {/* 2. LISTA DINÁMICA DE UNIDADES */}
+                    <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                        {unitsList.map((unit, index) => (
+                            <div key={index} className="flex flex-col md:flex-row gap-3 items-end bg-gray-50 dark:bg-[#3e3e50] p-3 rounded-xl border border-gray-200 dark:border-white/5 animate-fade-in">
+
+                                {/* Número de Unidad (Pequeño) */}
+                                <div className="w-full md:w-20">
+                                    <label className="block text-xs font-bold mb-1 text-gray-500 dark:text-gray-400">
+                                        No.
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={unit.number}
+                                        onChange={(e) => handleUnitChange(index, 'number', e.target.value)}
+                                        className="w-full bg-white dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-500"
+                                        placeholder="#"
+                                        required
+                                    />
+                                </div>
+
+                                {/* Título (Grande) */}
+                                <div className="flex-1 w-full">
+                                    <label className="block text-xs font-bold mb-1 text-gray-500 dark:text-gray-400">
+                                        Título de la Unidad
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={unit.title}
+                                        onChange={(e) => handleUnitChange(index, 'title', e.target.value)}
+                                        className="w-full bg-white dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-500"
+                                        placeholder="Ej: Introducción a Límites"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="w-full md:w-32">
+                                    <label className="block text-xs font-bold mb-1 text-gray-500 dark:text-gray-400">
+                                        Estado
+                                    </label>
+                                    <select
+                                        value={unit.active}
+                                        onChange={(e) => handleUnitChange(index, 'active', e.target.value)}
+                                        className="w-full bg-white dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-500"
+                                    >
+                                        <option value="S">Activa</option>
+                                        <option value="N">Inactiva</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex gap-2 pb-0.5">
+                                    {unitsList.length > 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => removeUnitRow(index)}
+                                            className="p-2 rounded-lg bg-red-100 text-red-500 hover:bg-red-200 dark:bg-red-500/20 dark:hover:bg-red-500/40 transition-colors"
+                                            title="Quitar esta unidad"
+                                        >
+                                            <IoTrash size={18} />
+                                        </button>
+                                    )}
+
+                                    {/* Botón Agregar (Verde/Amarillo) - Solo en el último elemento */}
+                                    {index === unitsList.length - 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={addUnitRow}
+                                            className="p-2 rounded-lg bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-500/20 dark:hover:bg-green-500/40 transition-colors"
+                                            title="Agregar otra unidad abajo"
+                                        >
+                                            <IoAdd size={18} />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium mb-1">N° Semestre al que pertenece</label>
-                        <input
-                            type="number"
-                            name="semester"
-                            value={formData.semester}
-                            onChange={handleInputChange}
-                            className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                            min={1}
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Estatus</label>
-                        <select
-                            name="active"
-                            value={formData.active}
-                            onChange={handleInputChange}
-                            className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                        >
-                            <option value={'S'}>Activa</option>
-                            <option value={'N'}>Inactiva (Baja Temporal)</option>
-                        </select>
-                    </div>
-
-                    <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-200 dark:border-white/10">
+                    {/* Footer Botones */}
+                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-white/10">
                         <button
                             type="button"
                             onClick={closeModal}
@@ -366,11 +434,12 @@ export default function AdminUnits() {
                             type="submit"
                             className="px-6 py-2 rounded-lg bg-yellow-500 text-black font-bold hover:bg-yellow-400 transition-colors shadow-lg"
                         >
-                            {editingSubject ? 'Actualizar Materia' : 'Guardar Materia'}
+                            Guardar {unitsList.length} {unitsList.length === 1 ? 'Unidad' : 'Unidades'}
                         </button>
                     </div>
+
                 </form>
-            </BaseModal> */}
+            </BaseModal>
         </div>
     );
 }
