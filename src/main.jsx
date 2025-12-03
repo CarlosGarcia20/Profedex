@@ -16,7 +16,7 @@ import Equipo from './pages/Common/Equipo/Equipo'
 import HomeTeacher from './pages/Common/Home/Home-Teacher'
 import CommunityContent from './pages/Common/Community/CommunityContent'
 import AdminLayout from './layouts/AdminLayout';
-import AdminUsers from './pages/admin/Users';
+// import AdminUsers from './pages/admin/Users';
 
 const root = createRoot(document.getElementById('root'))
 
@@ -57,7 +57,7 @@ root.render(
 					<Route path='/admin' element={<AdminLayout />}>
 						
 						{/* <Route index element= /> */}
-						<Route path='users' element={<AdminUsers />} />
+						{/* <Route path='users' element={<AdminUsers />} /> */}
 					
 					</Route>
 

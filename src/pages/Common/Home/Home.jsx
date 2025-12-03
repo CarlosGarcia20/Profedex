@@ -7,14 +7,13 @@ export default function Home() {
 
             <Header titulo="Bienvenido(a)" />
 
-            <nav className="bg-gray-300 p-4 relative flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg rounded-b-md">
+            <nav className="bg-gray-300 p-4 flex flex-wrap justify-between items-center gap-4 shadow-lg rounded-b-md">
                 <div className="text-xl font-bold text-blue-700">
-                    ¡Encuentralos a todos!
+                    ¡Encuéntralos a todos!
                 </div>
 
-                {/* Search controls: centered across the nav on larger screens, full-width centered on small screens */}
-                <div className="flex items-center justify-center w-full space-x-2 sm:absolute sm:left-1/2 sm:top-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-auto">
-                    <label htmlFor="search" className="font-semibold text-blue-700">
+                <div className="flex flex-wrap items-center gap-2 pr-5">
+                    <label htmlFor="search" className="font-semibold text-blue-700 ">
                     Buscar maestro(a):
                     </label>
                     <select
