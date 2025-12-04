@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import api from "../../../api/axios";
 import toast from "react-hot-toast";
 import GroupScheduleCards from "../../../components/admin/GroupSchedulerCard";
+import { IoCalendar } from "react-icons/io5";
 
 export default function AdminGroupScheduler() {
     const [groups, setGroups] = useState([]);
@@ -25,7 +26,7 @@ export default function AdminGroupScheduler() {
     return (
         <div className="text-black dark:text-white">
             <div className="text-black dark:text-white">
-                <div className="rounded-xl shadow-lg border border-white/5 overflow-hidden transition-colors duration-300 bg-white dark:bg-[#313141]">
+                <div className="rounded-xl shadow-lg border border-white/5 overflow-hidden transition-colors duration-300 bg-gray-200 dark:bg-[#313141]">
 
                     <div className="p-6 border-b border-white/10 flex flex-col lg:flex-row justify-between items-center bg-gray-50 dark:bg-[#3e3e50] gap-4">
 
@@ -45,9 +46,9 @@ export default function AdminGroupScheduler() {
                                     onChange={(e) => setSelectedGroup(e.target.value)}
                                     className='w-full appearance-none bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-sm pl-4 pr-8 py-2 rounded-lg shadow-md transition-all cursor-pointer border-none outline-none focus:ring-2 focus:ring-yellow-600 text-center text-ellipsis overflow-hidden'
                                 >
-                                    <option value="-1">Todos</option>
+                                    <option value="-1">Seleccionar un grupo</option>
                                     {groups.map(group => (
-                                        <option key={group.id} value={group.id} className="bg-white text-gray-700 dark:bg-gray-700 dark:text-white">
+                                        <option key={group.group_id} value={group.group_id} className="bg-white text-gray-700 dark:bg-gray-700 dark:text-white">
                                             {group.major} - {group.name}
                                         </option>
                                     ))}
@@ -61,16 +62,15 @@ export default function AdminGroupScheduler() {
                     </div>
 
                     <div className="p-6 min-h-[400px]">
-                        <GroupScheduleCards groupId={1} />
-                        {/* {selectedGroup !== "-1" ? (
-                        <GroupScheduleCards groupId={selectedGroup} />
-                    ) : (
-                        <div className="h-full flex flex-col items-center justify-center text-gray-400 py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
-                            <IoCalendar className="w-16 h-16 mb-4 opacity-50" />
-                            <p className="text-lg font-medium">Selecciona un grupo para ver sus horarios</p>
-                            <p className="text-sm opacity-60">Usa el filtro de arriba para comenzar</p>
-                        </div>
-                    )} */}
+                        {selectedGroup !== "-1" ? (
+                            <GroupScheduleCards groupId={selectedGroup} />
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center text-gray-400 py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
+                                <IoCalendar className="w-16 h-16 mb-4 opacity-50" />
+                                <p className="text-lg font-medium">Selecciona un grupo para ver sus horarios</p>
+                                <p className="text-sm opacity-60">Usa el filtro de arriba para comenzar</p>
+                            </div>
+                        )}
                     </div>
 
                 </div>
