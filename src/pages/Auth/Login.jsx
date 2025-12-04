@@ -98,6 +98,7 @@ export default function Login() {
 							className="w-full py-1 rounded-md bg-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
 							value={user}
 							onChange={(e) => setUser(e.target.value)}
+							autoComplete="off"
 							required
 						/>
 					</div>
