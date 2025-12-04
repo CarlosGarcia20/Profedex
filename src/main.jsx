@@ -23,6 +23,7 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminGroups from './pages/admin/school/Group';
 import AdminUnits from './pages/admin/school/Units';
 import AdminTopics from './pages/admin/school/Topics';
+import AdminGroupScheduler from './pages/admin/school/GroupScheduler';
 
 const root = createRoot(document.getElementById('root'))
 
@@ -75,6 +76,7 @@ root.render(
 						<Route path='subjects' element={<AdminSubjects />} />
 						<Route path='units' element={<AdminUnits />} />
 						<Route path='topics' element={<AdminTopics />} />
+						<Route path='groupscheduler' element={<AdminGroupScheduler />} />
 					</Route>
 
 				</Route>

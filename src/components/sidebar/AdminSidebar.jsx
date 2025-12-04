@@ -8,7 +8,11 @@ import { APP_NAME } from "../../config/constants";
 
 // ICONOS
 import { MdGroup, MdSpaceDashboard } from "react-icons/md";
-import { FaUser, FaBook, FaBars, FaBookOpen, FaBookReader, FaUniversity, FaChevronDown, FaChevronRight, FaUserGraduate, FaUserTie, FaUserPlus } from "react-icons/fa";
+import { 
+    FaUser, FaBook, FaBars, FaBookOpen, FaBookReader, 
+    FaUniversity, FaChevronDown, FaChevronRight, FaUserGraduate, 
+    FaUserTie, FaUserPlus, FaClock
+} from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
 
 export default function AdminSidebar() {
@@ -67,8 +71,9 @@ export default function AdminSidebar() {
                     <AdminLink to='/admin/majors' icon={<FaBars />} label="Carreras" isChild />
                     <AdminLink to='/admin/groups' icon={<MdGroup />} label="Grupos" isChild />
                     <AdminLink to="/admin/subjects" icon={<FaBook />} label="Materias" isChild />
-                    <AdminLink to="/admin/units" icon={<FaBookOpen />} label="Unidades" isChild />
-                    <AdminLink to="/admin/topics" icon={<FaBookReader />} label="Temas" isChild />
+                    <AdminLink to="/admin/units" icon={<FaBookOpen />} label="Unidades (Trabajando)" isChild />
+                    <AdminLink to="/admin/topics" icon={<FaBookReader />} label="Temas (Trabajando)" isChild />
+                    <AdminLink to="/admin/groupscheduler" icon={<FaClock />} label="Horarios" isChild />
                 </SidebarGroup>
 
             </nav>
