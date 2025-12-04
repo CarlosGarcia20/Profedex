@@ -72,6 +72,7 @@ export default function AdminUsers() {
 	function openModalAdd() {
 		setFormData(initialFormState);
 		setEditingUser(null);
+		setNicknameStatus('idle');
 		setIsOpen(true);
 	}
 
@@ -79,9 +80,10 @@ export default function AdminUsers() {
 		setFormData({
 			name: user.name,
 			nickname: user.nickname,
-			role: user.role
+			role: user.idrol
 		});
 		setEditingUser(user);
+		setNicknameStatus("valid");
 		setIsOpen(true);
 	}
 
@@ -95,27 +97,64 @@ export default function AdminUsers() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		if (!formData.role || formData.role == "-1" || formData.role == "") {
-			toast.error("Selecciona un rol válido");
+		for (const key of ["name", "nickname", "role"]) {
+			if (!formData[key] || formData[key].trim() === "") {
+				toast.error("Todos los campos son obligatorios");
+				return;
+			}
+		}
+
+		if (nicknameStatus !== "valid") {
+			toast.error("Debes validar el nickname antes de continuar");
 			return;
 		}
 
+		if (!editingUser || formData.password.length > 0 || formData.validatePassword.length > 0) {
+
+			if (formData.password !== formData.validatePassword) {
+				toast.error("Las contraseñas no coinciden");
+				return;
+			}
+
+			if (!formData.password) {
+				toast.error("La contraseña es obligatoria");
+				return;
+			}
+		}
+
+		const payload = {
+			name: formData.name,
+			nickname: formData.nickname,
+			role: formData.role,
+			...(formData.password ? { password: formData.password } : {})
+		};
+		
+		console.log("Payload enviado:", payload);
 		const isEditing = !!editingUser;
 
 		const apiCall = isEditing
-			? api.put(``)
-			: api.post('admin/users', formData);
-		
+			? api.put(`admin/users/${editingUser.userid}`, payload)
+			: api.post("admin/users", payload);
+
 		toast.promise(apiCall, {
-			loading: isEditing ? 'Actualizando...' : 'Guardando...',
+			loading: isEditing ? "Actualizando..." : "Guardando...",
 			success: () => {
 				fetchUsers();
 				closeModal();
-				return isEditing ? 'Usuario actualizado' : 'Datos guardados';
+				return isEditing ? "Usuario actualizado" : "Usuario creado";
 			},
-			error: (err) => err.message?.data?.message || 'Error al guardar'
+			error: (err) => {
+				console.log("📥 Response ERROR:", err.response);
+				console.log("📥 Response DATA:", err.response?.data);
+				console.log("📥 Response STATUS:", err.response?.status);
+
+				const msg = err.response?.data?.message;
+				if (!msg) return "Error al guardar";
+				return typeof msg === "string" ? msg : msg.message || "Error al guardar";
+			}
+
 		});
-	}
+	};
 
 	const handleValidateNickname = async (e) => {
 		e.preventDefault();
@@ -126,7 +165,8 @@ export default function AdminUsers() {
 
 		try {
 			const response = await api.post('admin/users/validate-nickname', {
-				nickname: formData.nickname
+				nickname: formData.nickname,
+				userid: editingUser?.userid || null
 			});
 
 			if (response.status === 200) {
@@ -142,7 +182,14 @@ export default function AdminUsers() {
 	};
 
 	const handleNicknameChange = (e) => {
-		setNicknameStatus('idle');
+		const { value } = e.target;
+
+		if (editingUser && value === editingUser.nickname) {
+			setNicknameStatus("valid");
+		} else {
+			setNicknameStatus("idle");
+		}
+
 		handleInputChange(e);
 	};
 
@@ -198,7 +245,7 @@ export default function AdminUsers() {
 
 					<div className='w-full md:w-1/3 flex justify-end'>
 						<button
-							className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-sm px-4 py-2 rounded-lg shadow-md transition-all whitespace-nowrap"
+							className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold cursor-pointer text-sm px-4 py-2 rounded-lg shadow-md transition-all whitespace-nowrap"
 							onClick={openModalAdd}
 						>
 							+ Agregar Nuevo
@@ -238,14 +285,14 @@ export default function AdminUsers() {
 												<div className="flex justify-end gap-2">
 													<button
 														onClick={() => openModalEdit(user)}
-														className="p-2 rounded-lg text-blue-600 dark:text-yellow-400 hover:bg-blue-50 dark:hover:bg-yellow-400/10 transition-all active:scale-95"
+														className="p-2 rounded-lg text-blue-600 dark:text-yellow-400 hover:bg-blue-50 dark:hover:bg-yellow-400/10 cursor-pointer transition-all active:scale-95"
 														title="Editar usuario"
 													>
 														<IoPencil size={20} />
 													</button>
 													<button
 														onClick={() => handleDelete(user.userid)}
-														className="p-2 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95"
+														className="p-2 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-500/10 cursor-pointer transition-all active:scale-95"
 														title="Eliminar usuario"
 													>
 														<IoTrash size={20} />
@@ -316,7 +363,7 @@ export default function AdminUsers() {
 									onClick={handleValidateNickname}
 									disabled={nicknameStatus === 'loading' || !formData.nickname}
 									className={`
-                    				shrink-0 p-2.5 rounded-lg font-bold text-white shadow-md transition-all
+                    				shrink-0 p-2.5 rounded-lg font-bold text-white cursor-pointer shadow-md transition-all
                     				flex items-center justify-center min-w-[44px]
                     				${nicknameStatus === 'valid'
 											? 'bg-green-500 hover:bg-green-600'
@@ -381,8 +428,8 @@ export default function AdminUsers() {
 							<input
 								type="password"
 								name="validatePassword"
-								// value={formData.hours}
-								// onChange={handleInputChange}
+								value={formData.validatePassword}
+								onChange={handleInputChange}
 								className="w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
 								min={1}
 								required
@@ -394,13 +441,22 @@ export default function AdminUsers() {
 						<button
 							type="button"
 							onClick={closeModal}
-							className="px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+							className="px-4 py-2 cursor-pointer rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
 						>
 							Cancelar
 						</button>
 						<button
 							type="submit"
-							className="px-6 py-2 rounded-lg bg-yellow-500 text-black font-bold hover:bg-yellow-400 transition-colors shadow-lg"
+							disabled={
+								!formData.name ||
+								!formData.nickname ||
+								!formData.role ||
+								nicknameStatus !== "valid"
+							}
+							className={` px-6 py-2 cursor-pointer rounded-lg font-bold transition-colors shadow-lg
+								${nicknameStatus === "valid"
+									? "bg-yellow-500 text-black hover:bg-yellow-400"
+									: "bg-gray-400 text-gray-700 cursor-not-allowed"} `}
 						>
 							{editingUser ? 'Actualizar usuario' : 'Guardar usuario'}
 						</button>
