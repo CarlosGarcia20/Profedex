@@ -24,6 +24,7 @@ export default function AdminUnits() {
 
     const [formData, setFormData] = useState(initialFormState);
     const [editingUnit, setEditingUnit] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // 1. Estado para la Materia Seleccionada
     const [selectedSubject, setSelectedSubject] = useState("-1");
@@ -90,52 +91,21 @@ export default function AdminUnits() {
         setIsOpen(false);
     }
 
-    function openModalEdit(subject) {
-        setFormData({
-            major_id: subject.major_id,
-            name: subject.name,
-            code: subject.code,
-            plan_year: subject.plan_year,
-            active: subject.active,
-            description: subject.description || '',
-            credits: subject.credits,
-            hours: subject.hours,
-            semester: subject.semester
-        });
-        setEditingUnit(subject);
-        setIsOpen(true);
-    }
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
-
-    // ENVIAR FORMULARIO (POST o PUT)
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!formData.major_id || formData.major_id == "-1" || formData.major_id == "") {
-            toast.error("Selecciona una carrera válida");
-            return;
-        }
-
-        const isEditing = !!editingSubject;
-
-        const apiCall = isEditing
-            ? api.put(`admin/subjects/${editingSubject.subject_id}`, formData)
-            : api.post('admin/subjects', formData);
-
-        toast.promise(apiCall, {
-            loading: isEditing ? 'Actualizando...' : 'Guardando...',
-            success: () => {
-                fetchSubjects();
-                closeModal();
-                return isEditing ? 'Materia actualizada' : 'Materia creada';
-            },
-            error: (err) => err.response?.data?.message || 'Error al guardar'
-        });
-    };
+    // function openModalEdit(subject) {
+    //     setFormData({
+    //         major_id: subject.major_id,
+    //         name: subject.name,
+    //         code: subject.code,
+    //         plan_year: subject.plan_year,
+    //         active: subject.active,
+    //         description: subject.description || '',
+    //         credits: subject.credits,
+    //         hours: subject.hours,
+    //         semester: subject.semester
+    //     });
+    //     setEditingUnit(subject);
+    //     setIsOpen(true);
+    // }
 
     const handleDelete = async (id) => {
         showAlertConfirm("¿Eliminar la unidad?", "Esta acción no se puede deshacer").then((result) => {
@@ -179,7 +149,98 @@ export default function AdminUnits() {
         });
     };
 
-    
+    const handleSubmitUnits = async (e) => {
+        e.preventDefault();
+
+        if (!selectedSubject || selectedSubject === "-1") {
+            toast.error("Selecciona una materia válida.");
+            return;
+        }
+
+        if (!unitsList || unitsList.length === 0) {
+            toast.error("Debes agregar al menos una unidad.");
+            return;
+        }
+
+        const normalizedUnits = [];
+        const numbersSeen = new Set();
+
+        for (let i = 0; i < unitsList.length; i++) {
+            const raw = unitsList[i] || {};
+            const numberRaw = raw.number === '' || raw.number == null ? '' : raw.number;
+            const titleRaw = (raw.title || '').toString().trim();
+            const activeRaw = raw.active || 'S';
+
+            // number requerido
+            if (numberRaw === '' || numberRaw === null) {
+                toast.error(`La fila ${i + 1} debe tener número.`);
+                return;
+            }
+
+            const numberParsed = Number(numberRaw);
+            if (!Number.isInteger(numberParsed) || numberParsed <= 0) {
+                toast.error(`El número de la unidad ${i + 1} debe ser un entero positivo.`);
+                return;
+            }
+
+            // title requerido
+            if (!titleRaw) {
+                toast.error(`La fila ${i + 1} debe tener un título.`);
+                return;
+            }
+
+            // números únicos
+            if (numbersSeen.has(numberParsed)) {
+                toast.error(`El número de unidad ${numberParsed} está repetido. Los números deben ser únicos.`);
+                return;
+            }
+            numbersSeen.add(numberParsed);
+
+            normalizedUnits.push({
+                number: numberParsed,
+                title: titleRaw,
+                active: activeRaw === 'S' ? 'S' : 'N'
+            });
+        }
+
+        const payload = {
+            subject_id: selectedSubject,
+            units: normalizedUnits
+        };
+
+        // evita doble envío
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+
+        try {
+            console.log(payload);
+            
+            // const endpoint = `admin/subjects/${selectedSubject}/units`;
+
+            // const apiPromise = api.post(endpoint, payload);
+
+            // await toast.promise(apiPromise, {
+            //     loading: 'Guardando unidades...',
+            //     success: (response) => {
+            //         fetchUnits(selectedSubject);
+            //         // limpiar modal y estado de unidades
+            //         setUnitsList([{ ...emptyUnit }]);
+            //         setSelectedSubject("-1");
+            //         setIsOpen(false);
+            //         setIsSubmitting(false);
+            //         return 'Unidades guardadas';
+            //     },
+            //     error: (err) => {
+            //         setIsSubmitting(false);
+            //         return err?.response?.data?.message || 'Error al guardar unidades';
+            //     }
+            // });
+        } catch (err) {
+            setIsSubmitting(false);
+            console.error(err);
+            toast.error('Error inesperado al guardar');
+        }
+    };
 
     return (
         <div className="text-black dark:text-white">
@@ -320,7 +381,7 @@ export default function AdminUnits() {
                 title={'Agregar Unidades'}
                 subtitle={'Ingresa los datos de las unidades para la materia'}
             >
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-6">
 
                     <div>
                         <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
@@ -330,7 +391,7 @@ export default function AdminUnits() {
                             value={selectedSubject}
                             onChange={(e) => setSelectedSubject(e.target.value)}
                             className='w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-gray-900 dark:text-white'
-                            name="subject"
+                            name="subject_id"
                             required
                         >
                             <option value="-1">Selecciona una materia</option>
@@ -360,6 +421,7 @@ export default function AdminUnits() {
                                         onChange={(e) => handleUnitChange(index, 'number', e.target.value)}
                                         className="w-full bg-white dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-500"
                                         placeholder="#"
+                                        min={1}
                                         required
                                     />
                                 </div>
@@ -405,7 +467,6 @@ export default function AdminUnits() {
                                         </button>
                                     )}
 
-                                    {/* Botón Agregar (Verde/Amarillo) - Solo en el último elemento */}
                                     {index === unitsList.length - 1 && (
                                         <button
                                             type="button"
@@ -432,13 +493,14 @@ export default function AdminUnits() {
                         </button>
                         <button
                             type="submit"
+                            onClick={handleSubmitUnits}
                             className="px-6 py-2 rounded-lg bg-yellow-500 text-black font-bold hover:bg-yellow-400 transition-colors shadow-lg"
                         >
                             Guardar {unitsList.length} {unitsList.length === 1 ? 'Unidad' : 'Unidades'}
                         </button>
                     </div>
 
-                </form>
+                </div>
             </BaseModal>
         </div>
     );
