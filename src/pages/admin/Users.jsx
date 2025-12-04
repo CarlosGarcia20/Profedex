@@ -122,38 +122,43 @@ export default function AdminUsers() {
 			}
 		}
 
-		const payload = {
-			name: formData.name,
-			nickname: formData.nickname,
-			role: formData.role,
-			...(formData.password ? { password: formData.password } : {})
-		};
+		showAlertConfirm('¿Quieres guardar el usuario?', 'Nota: una vez guardado no se podrá modificar el rol del usuario ni el nickname').then((result) => {
+			if (result.isConfirmed) {
+				const payload = {
+					name: formData.name,
+					nickname: formData.nickname,
+					role: formData.role,
+					...(formData.password ? { password: formData.password } : {})
+				};
+				
+				console.log("Payload enviado:", payload);
+				const isEditing = !!editingUser;
 		
-		console.log("Payload enviado:", payload);
-		const isEditing = !!editingUser;
-
-		const apiCall = isEditing
-			? api.put(`admin/users/${editingUser.userid}`, payload)
-			: api.post("admin/users", payload);
-
-		toast.promise(apiCall, {
-			loading: isEditing ? "Actualizando..." : "Guardando...",
-			success: () => {
-				fetchUsers();
-				closeModal();
-				return isEditing ? "Usuario actualizado" : "Usuario creado";
-			},
-			error: (err) => {
-				console.log("📥 Response ERROR:", err.response);
-				console.log("📥 Response DATA:", err.response?.data);
-				console.log("📥 Response STATUS:", err.response?.status);
-
-				const msg = err.response?.data?.message;
-				if (!msg) return "Error al guardar";
-				return typeof msg === "string" ? msg : msg.message || "Error al guardar";
+				const apiCall = isEditing
+					? api.put(`admin/users/${editingUser.userid}`, payload)
+					: api.post("admin/users", payload);
+		
+				toast.promise(apiCall, {
+					loading: isEditing ? "Actualizando..." : "Guardando...",
+					success: () => {
+						fetchUsers();
+						closeModal();
+						return isEditing ? "Usuario actualizado" : "Usuario creado";
+					},
+					error: (err) => {
+						console.log("📥 Response ERROR:", err.response);
+						console.log("📥 Response DATA:", err.response?.data);
+						console.log("📥 Response STATUS:", err.response?.status);
+		
+						const msg = err.response?.data?.message;
+						if (!msg) return "Error al guardar";
+						return typeof msg === "string" ? msg : msg.message || "Error al guardar";
+					}
+		
+				});
 			}
-
 		});
+
 	};
 
 	const handleValidateNickname = async (e) => {
