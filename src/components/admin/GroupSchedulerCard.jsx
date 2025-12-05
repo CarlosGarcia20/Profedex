@@ -28,6 +28,7 @@ export default function GroupScheduleCards({ groupId }) {
             const res = await api.get(`admin/groups/${groupId}/schedules`);
             setSchedules(res.data.data || []);
         } catch (error) {
+            console.error(error);
             toast.error("Error al cargar horarios");
         } finally {
             setLoading(false);
@@ -57,89 +58,93 @@ export default function GroupScheduleCards({ groupId }) {
 
     if (loading) return <div className="text-center p-4">Cargando horarios...</div>;
 
-    if (schedules.length === 0) {
-        return (
-            <div className="text-center p-8 bg-gray-50 dark:bg-[#3e3e50] rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
-                <IoCalendar className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Sin horarios asignados</h3>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Este grupo aún no tiene clases programadas.</p>
-                <button className="mt-4 text-yellow-600 hover:text-yellow-500 font-medium">
-                    + Asignar primer horario
-                </button>
-            </div>
-        );
-    }
-
     return (
         <div className="space-y-4">
-            <div className="flex justify-between items-center mb-2">
-                <h3 className="text-lg font-bold text-gray-700 dark:text-white flex items-center gap-2">
-                    <IoTime /> Horario Semanal
-                </h3>
-                <button 
-                    className="text-sm bg-yellow-500 text-black px-3 py-1 rounded-lg font-bold hover:bg-yellow-400 transition-colors shadow-sm flex items-center gap-1"
-                    onClick={() => setIsModalOpen(true)}    
-                >
-                    <IoAdd /> Agregar
-                </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {schedules.map((schedule) => {
-                    const dayConfig = DAYS_MAP[schedule.day_of_week] || DAYS_MAP.default;
-
-                    return (
-                        <div
-                            key={schedule.id}
-                            className={`
-                                relative p-4 rounded-lg shadow-sm hover:shadow-md transition-all 
-                                bg-white dark:bg-[#3e3e50] 
-                                ${dayConfig.colorClass} 
-                            `}
+            {schedules.length === 0 ? (
+                <div className="text-center p-8 bg-gray-50 dark:bg-[#3e3e50] rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                    <IoCalendar className="mx-auto h-12 w-12 text-gray-400" />
+                    <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Sin horarios asignados</h3>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Este grupo aún no tiene clases programadas.</p>
+                    <button
+                        className="mt-4 text-yellow-600 hover:text-yellow-500 font-medium"
+                        onClick={() => setIsModalOpen(true)}
+                    >
+                        + Asignar primer horario
+                    </button>
+                </div>
+            ) : (
+                <>
+                    <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-lg font-bold text-gray-700 dark:text-white flex items-center gap-2">
+                            <IoTime /> Horario Semanal
+                        </h3>
+                        <button 
+                            className="text-sm bg-yellow-500 text-black px-3 py-1 rounded-lg font-bold hover:bg-yellow-400 transition-colors shadow-sm flex items-center gap-1"
+                            onClick={() => setIsModalOpen(true)}
                         >
-                            <div className="absolute top-3 right-3 flex gap-2 group-hover:opacity-100 transition-opacity">
-                                <button className="text-gray-400 hover:text-blue-500">  
-                                    <IoPencil />
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(schedule.schedule_id)}
-                                    className="text-gray-400 hover:text-red-500"
+                            <IoAdd /> Agregar
+                        </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {schedules.map((schedule) => {
+                            const dayConfig = DAYS_MAP[schedule.day_of_week] || DAYS_MAP.default;
+    
+                            return (
+                                <div
+                                    key={schedule.id}
+                                    className={`
+                                        relative p-4 rounded-lg shadow-sm hover:shadow-md transition-all 
+                                        bg-white dark:bg-[#3e3e50] 
+                                        ${dayConfig.colorClass} 
+                                    `}
                                 >
-                                    <IoTrash />
-                                </button>
-                            </div>
-
-                            <div className="flex flex-col gap-3">
-                                <h4 className="font-bold text-lg text-gray-800 dark:text-white uppercase tracking-wide">
-                                    {dayConfig.label}
-                                </h4>
-
-                                <div className="flex items-start gap-2 text-gray-800 dark:text-white">
-                                    <IoBook className="text-purple-700 dark:text-purple-500 mt-1 shrink-0" />
-                                    <span className="font-bold text-base leading-tight">
-                                        {schedule.subject || "Nombre de la materia"}
-                                    </span>
+                                    <div className="absolute top-3 right-3 flex gap-2 group-hover:opacity-100 transition-opacity">
+                                        <button className="text-gray-400 hover:text-blue-500">  
+                                            <IoPencil />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(schedule.schedule_id)}
+                                            className="text-gray-400 hover:text-red-500"
+                                        >
+                                            <IoTrash />
+                                        </button>
+                                    </div>
+    
+                                    <div className="flex flex-col gap-3">
+                                        <h4 className="font-bold text-lg text-gray-800 dark:text-white uppercase tracking-wide">
+                                            {dayConfig.label}
+                                        </h4>
+    
+                                        <div className="flex items-start gap-2 text-gray-800 dark:text-white">
+                                            <IoBook className="text-purple-700 dark:text-purple-500 mt-1 shrink-0" />
+                                            <span className="font-bold text-base leading-tight">
+                                                {schedule.subject || "Nombre de la materia"}
+                                            </span>
+                                        </div>
+    
+                                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                                            <IoTime className="text-yellow-600 dark:text-yellow-500" />
+                                            <span className="font-mono text-sm font-semibold">
+                                                {schedule.start_time} - {schedule.end_time}
+                                            </span>
+                                        </div>
+    
+                                        <div className="flex items-center gap-2 text-gray-900 dark:text-gray-400 text-sm">
+                                            <IoLocation className="text-gray-950 dark:text-gray-400" />
+                                            <span>
+                                                Salón: 
+                                                <strong className="text-gray-700 dark:text-gray-200"> {schedule.classroom || 'Sin asignar'}</strong>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-
-                                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                                    <IoTime className="text-yellow-600 dark:text-yellow-500" />
-                                    <span className="font-mono text-sm font-semibold">
-                                        {schedule.start_time} - {schedule.end_time}
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center gap-2 text-gray-900 dark:text-gray-400 text-sm">
-                                    <IoLocation className="text-gray-950 dark:text-gray-400" />
-                                    <span>
-                                        Salón: 
-                                        <strong className="text-gray-700 dark:text-gray-200"> {schedule.classroom || 'Sin asignar'}</strong>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+                            );
+                        })}
+                    </div>
+                    
+                </>
+            )}
 
             <AssignScheduleModal
                 isOpen={isModalOpen}
