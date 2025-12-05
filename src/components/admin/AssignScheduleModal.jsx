@@ -13,11 +13,14 @@ import { showAlertConfirm } from "../../utils/alerts";
 Modal.setAppElement('#root');
 
 const modalStyles = {
-    overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: 50 },
+    overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)', zIndex: 1000 },
     content: {
-        top: '50%', left: '50%', right: 'auto', bottom: 'auto', marginRight: '-50%',
-        transform: 'translate(-50%, -50%)', padding: 0, border: 'none', background: 'transparent',
-        width: '95%', maxWidth: '900px', maxHeight: '90vh', overflow: 'hidden'
+        padding: 0,
+        border: 'none',
+        background: 'transparent',
+        // Cambiamos el '5%' por algo más pequeño o calculamos un ancho fijo
+        // '40px' deja un margen pequeño y elegante, usando casi toda la pantalla
+        inset: '40px'
     },
 };
 
@@ -34,6 +37,7 @@ const DAYS = [
 const emptySchedule = {
     id: Date.now(),
     subject_id: "",
+    teacher_id: "",
     day_of_week: 1,
     start_time: null,
     end_time: null,
@@ -43,6 +47,7 @@ const emptySchedule = {
 export default function AssignScheduleModal({ isOpen, onClose, groupId, onSuccess }) {
     const [subjects, setSubjects] = useState([]);
     const [classrooms, setClassrooms] = useState([]);
+    const [teachers, setTeachers] = useState([]);
 
     const [scheduleList, setScheduleList] = useState([emptySchedule]);
     
@@ -64,10 +69,22 @@ export default function AssignScheduleModal({ isOpen, onClose, groupId, onSucces
         }
     }
 
+    const fetchTeachers = async () => {
+        try {
+            const response = await api.get('admin/teachers');
+            setTeachers(response.data.data || []);
+        } catch (error) {
+            console.error();
+        }
+    }
+
     useEffect(() => {
         if (!isOpen) return;
         fetchSubjects();
         fetchClassrooms();
+        fetchTeachers();
+
+        console.log(teachers)
     }, [isOpen]);
 
     const addRow = () => setScheduleList([...scheduleList, { ...emptySchedule, id: Date.now() }]);
@@ -100,6 +117,7 @@ export default function AssignScheduleModal({ isOpen, onClose, groupId, onSucces
 
                 const schedulesPayload = scheduleList.map(row => ({
                     subject_id: row.subject_id,
+                    teacher_id: row.teacher_id,
                     day: row.day_of_week,
                     start_time: dayjs(row.start_time).format('HH:mm:ss'),
                     end_time: dayjs(row.end_time).format('HH:mm:ss'),
@@ -151,24 +169,24 @@ export default function AssignScheduleModal({ isOpen, onClose, groupId, onSucces
                     <form id="schedule-form" onSubmit={handleSubmit} className="space-y-4">
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
 
-                            {/* ENCABEZADOS  */}
-                            <div className="hidden md:grid grid-cols-12 gap-4 px-4 pb-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                <div className="col-span-3">Materia</div>
+                            {/* ENCABEZADOS (Desktop) - Total 12 columnas */}
+                            <div className="hidden md:grid grid-cols-12 gap-4 px-4 pb-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-center">
+                                <div className="col-span-3 text-left">Materia</div>
+                                <div className="col-span-3 text-left">Maestro</div>
                                 <div className="col-span-2">Día</div>
-                                <div className="col-span-2">Inicio</div>
-                                <div className="col-span-2">Fin</div>
-                                <div className="col-span-2">Salón</div>
-                                <div className="col-span-1 text-center">Acción</div>
+                                <div className="col-span-1">Inicio</div>
+                                <div className="col-span-1">Fin</div>
+                                <div className="col-span-1">Salón</div>
+                                <div className="col-span-1">Borrar</div>
                             </div>
 
                             {/* LISTA DE FILAS */}
                             {scheduleList.map((row, index) => (
                                 <div
-                                    key={row.id}
+                                    key={row.id || index}
                                     className="flex flex-col md:grid md:grid-cols-12 gap-3 md:gap-4 bg-white dark:bg-[#3e3e50] p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm md:items-center relative"
                                 >
-
-                                    {/* Botón Borrar */}
+                                    {/* Botón Borrar (Móvil - Absolute) */}
                                     <button
                                         type="button"
                                         onClick={() => removeRow(index)}
@@ -177,7 +195,7 @@ export default function AssignScheduleModal({ isOpen, onClose, groupId, onSucces
                                         <IoTrash size={20} />
                                     </button>
 
-                                    {/* 1. MATERIA */}
+                                    {/* 1. MATERIA  */}
                                     <div className="md:col-span-3">
                                         <label className="md:hidden text-xs font-bold text-gray-500 mb-1 block">Materia</label>
                                         <select
@@ -187,26 +205,43 @@ export default function AssignScheduleModal({ isOpen, onClose, groupId, onSucces
                                             required
                                         >
                                             <option value="">Seleccionar Materia...</option>
-                                            {subjects.map(sub => (
+                                            {subjects?.map(sub => (
                                                 <option key={sub.subject_id} value={sub.subject_id}>{sub.name}</option>
                                             ))}
                                         </select>
                                     </div>
 
-                                    {/* 2. DÍA */}
+                                    {/* 2. MAESTRO  */}
+                                    <div className="md:col-span-3">
+                                        <label className="md:hidden text-xs font-bold text-gray-500 mb-1 block">Maestro</label>
+                                        <select
+                                            value={row.teacher_id}
+                                            onChange={(e) => handleChange(index, 'teacher_id', e.target.value)}
+                                            className="w-full bg-gray-50 dark:bg-[#2d3748] border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-yellow-500 outline-none"
+                                            required
+                                        >
+                                            <option value="">Seleccionar Maestro...</option>
+                                            {teachers?.map(teacher => (
+                                                <option key={teacher.master_id} value={teacher.master_id}> {teacher.acronym} {teacher.lastname} {teacher.name} </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {/* 3. DÍA (2 columnas) */}
                                     <div className="md:col-span-2">
                                         <label className="md:hidden text-xs font-bold text-gray-500 mb-1 flex items-center gap-1"><IoCalendar /> Día</label>
                                         <select
                                             value={row.day_of_week}
                                             onChange={(e) => handleChange(index, 'day_of_week', e.target.value)}
                                             className="w-full bg-gray-50 dark:bg-[#2d3748] border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-yellow-500 outline-none"
+                                            required
                                         >
                                             {DAYS.map(day => <option key={day.id} value={day.id}>{day.label}</option>)}
                                         </select>
                                     </div>
 
-                                    {/* 3. INICIO */}
-                                    <div className="md:col-span-2">
+                                    {/* 4. INICIO (1 columna) */}
+                                    <div className="md:col-span-1">
                                         <label className="md:hidden text-xs font-bold text-gray-500 mb-1 flex items-center gap-1"><IoTime /> Inicio</label>
                                         <TimePicker
                                             value={row.start_time}
@@ -215,8 +250,8 @@ export default function AssignScheduleModal({ isOpen, onClose, groupId, onSucces
                                         />
                                     </div>
 
-                                    {/* 4. FIN */}
-                                    <div className="md:col-span-2">
+                                    {/* 5. FIN (1 columna) */}
+                                    <div className="md:col-span-1">
                                         <label className="md:hidden text-xs font-bold text-gray-500 mb-1 flex items-center gap-1"><IoTime /> Fin</label>
                                         <TimePicker
                                             value={row.end_time}
@@ -225,8 +260,8 @@ export default function AssignScheduleModal({ isOpen, onClose, groupId, onSucces
                                         />
                                     </div>
 
-                                    {/* 5. SALÓN */}
-                                    <div className="md:col-span-2">
+                                    {/* 6. SALÓN (1 columna) */}
+                                    <div className="md:col-span-1">
                                         <label className="md:hidden text-xs font-bold text-gray-500 mb-1 flex items-center gap-1"><IoLocation /> Salón</label>
                                         <select
                                             value={row.classroom_id}
@@ -235,18 +270,20 @@ export default function AssignScheduleModal({ isOpen, onClose, groupId, onSucces
                                             required
                                         >
                                             <option value="">Aula...</option>
-                                            {classrooms.map(room => (
+                                            {classrooms?.map(room => (
                                                 <option key={room.id} value={room.id}>{room.name}</option>
                                             ))}
                                         </select>
                                     </div>
 
-                                    <div className="hidden md:flex col-span-1 justify-center gap-2">
+                                    {/* BOTÓN BORRAR (Desktop - 1 columna) */}
+                                    <div className="hidden md:flex col-span-1 justify-center">
                                         {scheduleList.length > 1 && (
                                             <button
                                                 type="button"
                                                 onClick={() => removeRow(index)}
-                                                className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                className="p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                                title="Eliminar fila"
                                             >
                                                 <IoTrash size={20} />
                                             </button>
@@ -272,15 +309,14 @@ export default function AssignScheduleModal({ isOpen, onClose, groupId, onSucces
                     <button type="button" onClick={onClose} className="px-5 py-2.5 text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">
                         Cancelar
                     </button>
-                    <button 
-                        type="submit" 
-                        form="schedule-form" 
+                    <button
+                        type="submit"
+                        form="schedule-form"
                         className="px-6 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg shadow-lg hover:shadow-yellow-500/20 transition-all transform hover:-translate-y-0.5"
                     >
                         Guardar {scheduleList.length} horarios
                     </button>
                 </div>
-
             </div>
         </Modal>
     );
