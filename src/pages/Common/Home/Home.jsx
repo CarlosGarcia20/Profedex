@@ -1,7 +1,35 @@
-import DashboardLayout from "../../../layouts/DashboardLayout";
+import { useState, useEffect } from "react";
 import Header from "../../../components/header/HeaderGeneral";
+import toast from "react-hot-toast";
+import api from "../../../api/axios";
 
 export default function Home() {
+    const [teachers, setTeachers] = useState([]);
+  
+    const fetchTeachers = async () => {
+        const teacherPromise = api.get('students/me/teachers');
+        toast.promise(
+            teacherPromise,
+            {
+                loading: 'Cargando maestros...',
+                success: (response) => {
+                    console.log(response.data.data);
+                    
+                    setTeachers(response.data.data);
+
+                    return 'Maestros cargados'
+                },
+                error: (err) => {
+                    return 'No hay'
+                }
+            }
+        );
+    }
+
+    useEffect(() => {
+        fetchTeachers();
+    }, [])
+
     return (
         <div>
 
@@ -14,14 +42,20 @@ export default function Home() {
 
                 <div className="flex flex-wrap items-center gap-2 pr-5">
                     <label htmlFor="search" className="font-semibold text-blue-700 ">
-                    Buscar maestro(a):
+                        Buscar maestro(a):
                     </label>
                     <select
-                    id="search"
-                    name="search"
-                    className="p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
+                        id="search"
+                        name="search"
+                        // CAMBIO AQUÍ: Agregué 'w-64 md:w-96' para hacerlo más largo
+                        className="w-64 md:w-96 p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
                     >
-                    <option>Seleccionar</option>
+                        <option>Seleccionar un maestro</option>
+                        {teachers?.map((teacher) => (
+                            <option key={teacher.master_id} value={teacher.master_id}>
+                                {teacher.master}
+                            </option>
+                        ))}
                     </select>
                 </div>
             </nav>
