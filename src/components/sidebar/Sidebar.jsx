@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuth } from "../../context/AuthContext";
 
 import {
     HiMenu,
@@ -7,10 +8,13 @@ import {
     HiBookOpen,
     HiInformationCircle,
 } from "react-icons/hi";
-
 import { FaFileUpload } from "react-icons/fa";
 
+
 export default function Sidebar() {
+    const { user } = useAuth();
+
+    const user_image = user.image;
 
     const isTeacher = location.pathname.startsWith("/teacher");
     const basePath = isTeacher ? "/teacher" : "/student";
@@ -53,7 +57,7 @@ export default function Sidebar() {
                         transition={{ duration: 0.2 }}
                     >
                         <img
-                            src="https://api.github.com/users/CarlosGarcia20.png"
+                            src={user_image}
                             alt="Perfil"
                             className="w-12 h-12 rounded-full border-2 border-white shadow-md bg-red-800"
                         />

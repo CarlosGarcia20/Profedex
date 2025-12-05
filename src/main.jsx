@@ -24,78 +24,83 @@ import AdminGroups from './pages/admin/school/Group';
 import AdminUnits from './pages/admin/school/Units';
 import AdminTopics from './pages/admin/school/Topics';
 import AdminGroupScheduler from './pages/admin/school/GroupScheduler';
+import { AuthProvider } from './context/AuthContext';
 
 const root = createRoot(document.getElementById('root'))
 
 root.render(
-	<StrictMode>
-		<Toaster
-			position="top-center"
-			toastOptions={{
-				style: {
-					background: '#313141',
-					color: '#e5e7eb',
-					border: '1px solid #52525a',
-				},
-				success: {
-					iconTheme: {
-						primary: '#0ba600',
-						secondary: '#413133',
+	<AuthProvider>
+
+		<StrictMode>
+			<Toaster
+				position="top-center"
+				toastOptions={{
+					style: {
+						background: '#313141',
+						color: '#e5e7eb',
+						border: '1px solid #52525a',
 					},
-				},
-				error: {
-					iconTheme: {
-						primary: '#ef4444',
-						secondary: '#ffffff',
+					success: {
+						iconTheme: {
+							primary: '#0ba600',
+							secondary: '#413133',
+						},
 					},
-				},
-			}}
-		/>
+					error: {
+						iconTheme: {
+							primary: '#ef4444',
+							secondary: '#ffffff',
+						},
+					},
+				}}
+			/>
 
-		<BrowserRouter>
-			<Routes>
-				{/* Public Routes */}
-				<Route path="/" element={<Navigate to="/login" />} />
-				<Route path="/login" element={<Login />} />
-				<Route path="/register" element={<Register />} />
+			<BrowserRouter>
+				<Routes>
+					{/* Public Routes */}
+					<Route path="/" element={<Navigate to="/login" />} />
+					<Route path="/login" element={<Login />} />
+					<Route path="/register" element={<Register />} />
 
-				{/* Admin Route */}
-				<Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-					<Route path='/admin' element={<AdminLayout />}>
-						
-						{/* <Route index element= /> */}
-						<Route path='' element={<AdminDashboard />} />
-						
-						{/* Rutas para la gestión de usuarios */}
-						<Route path='users' element={<AdminUsers />} />
-						<Route path='users/students' element={<AdminUsers />} />
+					{/* Admin Route */}
+					<Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+						<Route path='/admin' element={<AdminLayout />}>
+							
+							{/* <Route index element= /> */}
+							<Route path='' element={<AdminDashboard />} />
+							
+							{/* Rutas para la gestión de usuarios */}
+							<Route path='users' element={<AdminUsers />} />
+							<Route path='users/students' element={<AdminUsers />} />
 
-						{/* Rutas para la gestión escolar */ }
-						<Route path='majors' element={<AdminMajors />} />
-						<Route path='groups' element={<AdminGroups />} />
-						<Route path='subjects' element={<AdminSubjects />} />
-						<Route path='units' element={<AdminUnits />} />
-						<Route path='topics' element={<AdminTopics />} />
-						<Route path='groupscheduler' element={<AdminGroupScheduler />} />
+							{/* Rutas para la gestión escolar */ }
+							<Route path='majors' element={<AdminMajors />} />
+							<Route path='groups' element={<AdminGroups />} />
+							<Route path='subjects' element={<AdminSubjects />} />
+							<Route path='units' element={<AdminUnits />} />
+							<Route path='topics' element={<AdminTopics />} />
+							<Route path='groupscheduler' element={<AdminGroupScheduler />} />
+						</Route>
+
 					</Route>
 
-				</Route>
+					{/* Routes With Layout */}
+					<Route path='/' element={<DashboardLayout />}>
+						{/* Student Routes */}
+						<Route path="/student" element={<Home />} />
+						<Route path="/student/profile" element={<AlumnoP />} />
+						<Route path="/student/team" element={<Equipo />} />
+						
+						{/* Teacher Routes */}
+						<Route path="/teacher" element={<HomeTeacher />} />
+						<Route path="/teacher/profile" element={<MaestroP />} />
+						
+						<Route path="/community" element={<CommunityContent />} />
+					</Route>
+				</Routes>
+			</BrowserRouter>
 
-				{/* Routes With Layout */}
-				<Route path='/' element={<DashboardLayout />}>
-					{/* Student Routes */}
-					<Route path="/student" element={<Home />} />
-					<Route path="/student/profile" element={<AlumnoP />} />
-					<Route path="/student/team" element={<Equipo />} />
-					
-					{/* Teacher Routes */}
-					<Route path="/teacher" element={<HomeTeacher />} />
-					<Route path="/teacher/profile" element={<MaestroP />} />
-					
-					<Route path="/community" element={<CommunityContent />} />
-				</Route>
-			</Routes>
-		</BrowserRouter>
-
-	</StrictMode>
+		</StrictMode>
+		
+	</AuthProvider>
 );

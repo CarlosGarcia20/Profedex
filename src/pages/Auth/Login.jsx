@@ -4,6 +4,7 @@ import profedex from "../../assets/images/Profedex.png";
 import api from "../../api/axios";
 
 import toast from 'react-hot-toast';
+import { useAuth } from "../../context/AuthContext";
 
 const ROLE_PATHS = {
 	'1': 'admin',
@@ -15,6 +16,7 @@ export default function Login() {
 	const [user, setUser] = useState("");
 	const [password, setPassword] = useState("");
 	const navigate = useNavigate();
+	const { login } = useAuth();
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -52,19 +54,15 @@ export default function Login() {
 
 		try {
 			const response = await loginPromise;
-
-			const { idRol, nickname, name } = response.data.user;
-
+			const { idRol, nickname, name, image } = response.data.user;
 			const rolePath = ROLE_PATHS[String(idRol)];
 
-			if (!rolePath) {
-				toast.error("Error: Rol de usuario no reconocido");
-			}
-
-			localStorage.setItem("isLoggedIn", "true");
-			localStorage.setItem("nickname", nickname);
-			localStorage.setItem("name", name);
-			localStorage.setItem("role", rolePath);
+			login({
+				nickname,
+				name,
+				rolePath,
+				image
+			});
 
 			navigate(`/${rolePath}`);
 		} catch (error) {
