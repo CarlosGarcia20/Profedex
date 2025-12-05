@@ -50,3 +50,20 @@ export const showAlertConfirm = (title, text) => {
         reverseButtons: true
     });
 };
+
+export const showRejectedImage = (title, html) => {
+    return ProfedexAlert.fire({
+        title: title, 
+        icon: 'warning',
+        html: `
+            <p class="mb-3">El sistema de moderación detectó contenido no permitido:</p>
+                <ul class="text-red-600 bg-red-50 p-4 rounded-lg border border-red-200 text-sm font-medium list-none">
+                    ${html}
+                </ul>
+            <p class="mt-3 text-xs text-gray-500">Por favor, sube una imagen apropiada para la comunidad.</p>
+        `,
+        confirmButtonText: 'Entendido', 
+        confirmButtonColor: '#d33',
+        focusConfirm: false
+    })
+}
