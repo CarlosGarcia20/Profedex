@@ -25,6 +25,7 @@ export default function AdminUsers() {
 	const [roles, setRoles] = useState([]);
 	const [modalIsOpen, setIsOpen] = useState(false);
 	const [filterRoles, setFilterRoles] = useState("-1");
+	const [formMode, setFormMode] = useState("default"); 
 
 	const [formData, setFormData] = useState(initialFormState);
 	const [editingUser, setEditingUser] = useState(null);
@@ -72,7 +73,8 @@ export default function AdminUsers() {
 	function openModalAdd() {
 		setFormData(initialFormState);
 		setEditingUser(null);
-		setNicknameStatus('idle');
+		setFormMode("normal");
+		setNicknameStatus("idle");
 		setIsOpen(true);
 	}
 
@@ -82,7 +84,9 @@ export default function AdminUsers() {
 			nickname: user.nickname,
 			role: user.idrol
 		});
+
 		setEditingUser(user);
+		setFormMode(user.idrol === 3 ? "alumno" : "normal");
 		setNicknameStatus("valid");
 		setIsOpen(true);
 	}
@@ -340,78 +344,115 @@ export default function AdminUsers() {
 
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div>
-							<label className="block text-sm font-medium mb-1">Nickname</label>
-							<div className="flex gap-2 items-center">
+							<label className="block text-sm font-medium mb-1">
+								{formMode === "alumno" ? "Número de cuenta" : "Nickname"}
+							</label>
+
+							{formMode === "alumno" ? (
+								// ----------- MODO ALUMNO (Número de cuenta DESHABILITADO) -----------
 								<input
 									type="text"
 									name="nickname"
 									value={formData.nickname}
-									onChange={handleNicknameChange}
-									className={`
-										flex-1 
-										bg-gray-50 dark:bg-[#52525a] 
-										border rounded-lg px-4 py-2 
-										focus:outline-none focus:ring-2 
-										transition-colors
-										${nicknameStatus === 'valid'
-												? 'border-green-500 focus:ring-green-500'
-												: nicknameStatus === 'invalid'
-												? 'border-red-500 focus:ring-red-500'
-												: 'border-gray-300 dark:border-gray-600 focus:ring-yellow-500'
-										}
-									`}
-									required
+									disabled
+									className="
+										w-full bg-gray-200 dark:bg-gray-600
+										border border-gray-300 dark:border-gray-500
+										rounded-lg px-4 py-2
+										text-gray-600 dark:text-gray-300
+										cursor-not-allowed opacity-80
+									"
 								/>
+							) : (
+								// ----------- MODO NORMAL (Nickname + Validación) -----------
+								<div className="flex gap-2 items-center">
+									<input
+										type="text"
+										name="nickname"
+										value={formData.nickname}
+										onChange={handleNicknameChange}
+										className={`
+											flex-1 bg-gray-50 dark:bg-[#52525a]
+											border rounded-lg px-4 py-2
+											focus:outline-none focus:ring-2 transition-colors
+											${
+												nicknameStatus === "valid"
+													? "border-green-500 focus:ring-green-500"
+													: nicknameStatus === "invalid"
+													? "border-red-500 focus:ring-red-500"
+													: "border-gray-300 dark:border-gray-600 focus:ring-yellow-500"
+											}
+										`}
+										required
+									/>
 
-								<button
-									type="button"
-									onClick={handleValidateNickname}
-									disabled={nicknameStatus === 'loading' || !formData.nickname}
-									className={`
-                    				shrink-0 p-2.5 rounded-lg font-bold text-white cursor-pointer shadow-md transition-all
-                    				flex items-center justify-center min-w-[44px]
-                    				${nicknameStatus === 'valid'
-											? 'bg-green-500 hover:bg-green-600'
-											: nicknameStatus === 'invalid'
-											? 'bg-red-500 hover:bg-red-600'
-											: 'bg-blue-600 hover:bg-blue-500 dark:bg-yellow-500 dark:hover:bg-yellow-400 dark:text-black'
-										}
-                    				disabled:opacity-50 disabled:cursor-not-allowed
-                				`}
-									title="Validar disponibilidad"
-								>
-									{nicknameStatus === 'loading' ? (
-										<IoReload className="animate-spin w-5 h-5" />
-									) : nicknameStatus === 'valid' ? (
-										<IoCheckmarkCircle className="w-5 h-5" />
-									) : nicknameStatus === 'invalid' ? (
-										<IoCloseCircle className="w-5 h-5" />
-									) : (
-										<IoSearch className="w-5 h-5" />
-									)}
-								</button>
-							</div>
-							{nicknameStatus === 'invalid' && (
+									<button
+										type="button"
+										onClick={handleValidateNickname}
+										disabled={nicknameStatus === "loading" || !formData.nickname}
+										className={`
+											shrink-0 p-2.5 rounded-lg font-bold text-white cursor-pointer shadow-md 
+											transition-all flex items-center justify-center min-w-[44px]
+											${
+												nicknameStatus === "valid"
+													? "bg-green-500 hover:bg-green-600"
+													: nicknameStatus === "invalid"
+													? "bg-red-500 hover:bg-red-600"
+													: "bg-blue-600 hover:bg-blue-500 dark:bg-yellow-500 dark:hover:bg-yellow-400 dark:text-black"
+											}
+											disabled:opacity-50 disabled:cursor-not-allowed
+										`}
+									>
+										{nicknameStatus === "loading" ? (
+											<IoReload className="animate-spin w-5 h-5" />
+										) : nicknameStatus === "valid" ? (
+											<IoCheckmarkCircle className="w-5 h-5" />
+										) : nicknameStatus === "invalid" ? (
+											<IoCloseCircle className="w-5 h-5" />
+										) : (
+											<IoSearch className="w-5 h-5" />
+										)}
+									</button>
+								</div>
+							)}
+
+							{nicknameStatus === "invalid" && formMode !== "alumno" && (
 								<p className="text-xs text-red-500 mt-1">Este nickname ya está en uso.</p>
 							)}
 						</div>
 					</div>
 
 					<div>
-						<label className="block text-sm font-medium mb-1">Rol del usuario</label>
+						<label className="block text-sm font-medium mb-1">
+							{formMode === "alumno" ? "Grupo" : "Rol del usuario"}
+						</label>
+
 						<select
-							name='role'
+							name="role"
 							value={formData.role}
 							onChange={handleInputChange}
-							className='w-full bg-gray-50 dark:bg-[#52525a] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-gray-900 dark:text-white'
+							className="
+								w-full bg-gray-50 dark:bg-[#52525a]
+								border border-gray-300 dark:border-gray-600
+								rounded-lg px-4 py-2
+								focus:outline-none focus:ring-2 focus:ring-yellow-500
+								text-gray-900 dark:text-white
+							"
 							required
 						>
-							<option value="-1">Selecciona un rol</option>
-							{roles.map((role) => (
-								<option key={role.idrol} value={role.idrol}>
-									{role.name}
-								</option>
-							))}
+							<option value="-1">Selecciona una opción</option>
+
+							{formMode === "alumno"
+								? groups.map((grupo) => (
+									<option key={grupo.idgrupo} value={grupo.idgrupo}>
+										{grupo.nombre}
+									</option>
+								))
+								: roles.map((role) => (
+									<option key={role.idrol} value={role.idrol}>
+										{role.name}
+									</option>
+								))}
 						</select>
 					</div>
 
@@ -454,9 +495,8 @@ export default function AdminUsers() {
 							type="submit"
 							disabled={
 								!formData.name ||
-								!formData.nickname ||
 								!formData.role ||
-								nicknameStatus !== "valid"
+								(formMode !== "alumno" && nicknameStatus !== "valid")
 							}
 							className={` px-6 py-2 cursor-pointer rounded-lg font-bold transition-colors shadow-lg
 								${nicknameStatus === "valid"
