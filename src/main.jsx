@@ -8,7 +8,7 @@ import { ProtectedRoute } from './components/protectedRoutes/protected';
 
 import DashboardLayout from './layouts/DashboardLayout'
 import Login from './pages/Auth/Login'
-import Register from './pages/Auth/Register'
+// import Register from './pages/Auth/Register'
 import Home from './pages/Common/Home/Home'
 import AlumnoP from './pages/Common/Profiles/AlumnoP'
 import MaestroP from './pages/Common/Profiles/MaestroP'
@@ -33,7 +33,7 @@ const root = createRoot(document.getElementById('root'))
 
 root.render(
 	<AuthProvider>
-
+		
 		<StrictMode>
 			<Toaster
 				position="top-center"
@@ -56,55 +56,61 @@ root.render(
 						},
 					},
 				}}
-			/>
+			/>				
+		</StrictMode>
 
-			<BrowserRouter>
-				<Routes>
-					{/* Public Routes */}
-					<Route path="/" element={<Navigate to="/login" />} />
-					<Route path="/login" element={<Login />} />
-					<Route path="/register" element={<Register />} />
+		<BrowserRouter>
+			<Routes>
+				{/* Public Routes */}
+				<Route path="/" element={<Navigate to="/login" />} />
+				<Route path="/login" element={<Login />} />
+				{/* <Route path="/register" element={<Register />} /> */}
 
-					{/* Admin Route */}
-					<Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-						<Route path='/admin' element={<AdminLayout />}>
-							
-							{/* <Route index element= /> */}
-							<Route path='' element={<AdminDashboard />} />
-							
-							{/* Rutas para la gestión de usuarios */}
-							<Route path='users' element={<AdminUsers />} />
-							<Route path='users/students' element={<AdminUsers />} />
+				{/* Admin Route */}
+				<Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+					<Route path='/admin' element={<AdminLayout />}>
 
-							{/* Rutas para la gestión escolar */ }
-							<Route path='majors' element={<AdminMajors />} />
-							<Route path='groups' element={<AdminGroups />} />
-							<Route path='subjects' element={<AdminSubjects />} />
-							<Route path='units' element={<AdminUnits />} />
-							<Route path='topics' element={<AdminTopics />} />
-							<Route path='groupscheduler' element={<AdminGroupScheduler />} />
-						</Route>
+						{/* <Route index element= /> */}
+						<Route path='' element={<AdminDashboard />} />
 
+						{/* Rutas para la gestión de usuarios */}
+						<Route path='users' element={<AdminUsers />} />
+						<Route path='users/students' element={<AdminUsers />} />
+
+						{/* Rutas para la gestión escolar */}
+						<Route path='majors' element={<AdminMajors />} />
+						<Route path='groups' element={<AdminGroups />} />
+						<Route path='subjects' element={<AdminSubjects />} />
+						<Route path='units' element={<AdminUnits />} />
+						<Route path='topics' element={<AdminTopics />} />
+						<Route path='groupscheduler' element={<AdminGroupScheduler />} />
 					</Route>
+				</Route>
 
-					{/* Routes With Layout */}
-					<Route path='/' element={<DashboardLayout />}>
-						{/* Student Routes */}
+				{/* Rutas con dashboard */}
+				<Route path='/' element={<DashboardLayout />}>
+
+					{/* Rutas de estudiante */}
+					<Route element={<ProtectedRoute allowedRoles={['student']} />}>
 						<Route path="/student" element={<Home />} />
 						<Route path="/student/profile" element={<AlumnoP />} />
 						<Route path="/student/team" element={<Equipo />} />
 						<Route path="/student/info" element={<Info />} />
-						
-						{/* Teacher Routes */}
+					</Route>
+
+					{/* Rutas del maestro */}
+					<Route element={<ProtectedRoute allowedRoles={['teacher']} />}>
 						<Route path="/teacher" element={<HomeTeacher />} />
 						<Route path="/teacher/profile" element={<MaestroP />} />
-						
+					</Route>
+
+					{/* Rutas compartidas */}
+					<Route element={<ProtectedRoute allowedRoles={['student', 'teacher']} />} >
 						<Route path="/community" element={<CommunityContent />} />
 					</Route>
-				</Routes>
-			</BrowserRouter>
 
-		</StrictMode>
-		
+				</Route>				
+			</Routes>
+		</BrowserRouter>
 	</AuthProvider>
 );
