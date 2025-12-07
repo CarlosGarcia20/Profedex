@@ -1,9 +1,68 @@
-import DashboardLayout from "../../../layouts/DashboardLayout";
 import Header from "../../../components/header/HeaderGeneral";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { socket } from "../../../services/socket";
+import toast from "react-hot-toast";
+import api from "../../../api/axios";
 
 export default function HomeTeacher() {
 	const [isLocationEnabled, setIsLocationEnabled] = useState(false);
+	const watchIdRef = useRef(null);
+
+	const startSharing = async() => {
+		if (!("geolocation" in navigator)) {
+			setIsLocationEnabled(false);
+			return toast.error("Tu navegador no soporta geolocalización");
+		}
+
+		const teacherInformation = await api.get('teachers/me-info');
+		const master_id = teacherInformation.data.data.master_id
+		
+		socket.connect();
+
+		watchIdRef.current = navigator.geolocation.watchPosition(
+			(position) => {
+				const { latitude, longitude } = position.coords;
+				socket.emit('teacher:start', {
+					coords: { lat: latitude, lng: longitude },
+					master_id
+				});
+			},
+			(error) => {
+				console.error(error);
+				toast.error("Error obteniendo ubicación");
+				setIsLocationEnabled(false);
+			},
+			{ 
+				enableHighAccuracy: false,
+				timeout: 15000, 
+				maximumAge: 10000 
+			}
+		);
+
+		toast.success("¡Ubicación activada!");
+	};
+
+	const stopSharing = () => {
+		if (watchIdRef.current) {
+			navigator.geolocation.clearWatch(watchIdRef.current);
+			watchIdRef.current = null;
+		}
+		socket.emit('teacher:stop')
+		socket.disconnect();
+		toast("Ubicación detenida");
+	};
+
+	useEffect(() => {
+		if (isLocationEnabled) {
+			startSharing();
+		} else {
+			if (watchIdRef.current) stopSharing();
+		}
+
+		return () => {
+			if (watchIdRef.current) stopSharing();
+		};
+	}, [isLocationEnabled]);
 
 	return (
 		<div>
@@ -21,7 +80,7 @@ export default function HomeTeacher() {
 										type="button"
 										onClick={() => setIsLocationEnabled(!isLocationEnabled)}
 										className={`${isLocationEnabled ? "bg-blue-600" : "bg-gray-50"
-											} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+											} relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
 										role="switch"
 										aria-checked={isLocationEnabled}
 									>
@@ -35,7 +94,7 @@ export default function HomeTeacher() {
 											Ubicación en tiempo real
 										</p>
 										<p className="text-sm text-gray-600">
-											{isLocationEnabled ? "Activado" : "Desactivado"}
+											{isLocationEnabled ? "Activado (Enviando señal...)" : "Desactivado"}
 										</p>
 									</div>
 								</div>
@@ -53,7 +112,14 @@ export default function HomeTeacher() {
 							</div>
 						</div>
 
-						<div className="lg:col-span-2">
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+{/* <div className="lg:col-span-2">
 							<h2 className="text-xl font-bold text-blue-700 mb-2">Agenda</h2>
 
 							<div className="overflow-x-auto shadow-md rounded-lg">
@@ -96,10 +162,4 @@ export default function HomeTeacher() {
 									<tbody></tbody>
 								</table>
 							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-}
+						</div> */}
