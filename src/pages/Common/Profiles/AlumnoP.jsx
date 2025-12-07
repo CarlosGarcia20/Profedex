@@ -47,7 +47,7 @@ const AlumnoPerfil = () => {
         const formData = new FormData();
         formData.append('avatar', file);
 
-        const uploadPromise = api.patch('students/profile-picture', formData, {
+        const uploadPromise = api.patch('posts/profile-picture', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
