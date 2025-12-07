@@ -32,7 +32,7 @@ export default function Home() {
 
 	const selectedTeacherName = teachers.find(t => String(t.master_id) === String(selectedTeacherId))?.master;
 
-	return(
+	return (
 		<div>
 			<Header titulo="Bienvenido(a)" />
 
@@ -81,7 +81,7 @@ export default function Home() {
 					{/* 3. CONTENEDOR DEL MAPA */}
 					<div className="w-full h-96 bg-white rounded-md overflow-hidden shadow-inner border border-gray-400 relative">
 						{selectedTeacherId ? (
-							<StudentMap classId={selectedTeacherId} />
+							<StudentMap teacherId={selectedTeacherId} />
 						) : (
 							<div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50">
 								<i className="fas fa-map-marked-alt text-5xl mb-3 text-gray-300"></i>

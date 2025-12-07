@@ -18,14 +18,14 @@ L.Marker.prototype.options.icon = DefaultIcon;
 function RecenterMap({ coords }) {
     const map = useMap();
     useEffect(() => {
-        if (coords) {
+        if (coords && typeof coords.lat === 'number' && typeof coords.lng === 'number') {
             map.flyTo([coords.lat, coords.lng], map.getZoom());
         }
-    }, [coords]);
+    }, [coords, map]);
     return null;
 }
 
-export default function StudentMap({ classId }) {
+export default function StudentMap({ teacherId }) {
     const [teacherLocation, setTeacherLocation] = useState(null);
 
     // 1. COORDENADAS DE LA ESCUELA (Centro)
@@ -37,33 +37,50 @@ export default function StudentMap({ classId }) {
     ];
 
     useEffect(() => {
-        socket.connect();
-        socket.emit('join_class_room', { classId, role: 'student' });
+        if (!teacherId) return;
 
-        socket.on('receive_location', (data) => {
-            setTeacherLocation(data.coords);
-        });
+        socket.connect();
+        socket.emit('student:join_map');
+
+        socket.on('map:update', (allActiveTeachers) => {
+            console.log("Lista recibida: ", allActiveTeachers);
+
+            const myTeacher = allActiveTeachers.find(
+                (t) => String(t.masterId) === String(teacherId)
+            )
+
+            if (myTeacher) {
+                setTeacherLocation({
+                    lat: myTeacher.lat,
+                    lng: myTeacher.lng,
+                    lastUpdate: myTeacher.lastUpdate
+                });
+            } else {
+                setTeacherLocation(null);
+            }
+        })
 
         return () => {
-            socket.off('receive_location');
+            socket.off('map:update');
             socket.disconnect();
+            setTeacherLocation(null);
         };
-    }, [classId]);
+    }, [teacherId]);
 
     return (
         <div className="h-full w-full">
             <MapContainer
                 center={schoolCenter}
                 zoom={16}
-                minZoom={18}
-                maxZoom={18}
-                maxBounds={mapBounds}
-                maxBoundsViscosity={1.0}
-                dragging={false}
-                touchZoom={false}
-                doubleClickZoom={false}
-                scrollWheelZoom={false}
-                zoomControl={false}
+                minZoom={15}
+                maxZoom={20}
+                // maxBounds={mapBounds}
+                // maxBoundsViscosity={1.0}
+                // dragging={false}
+                // touchZoom={false}
+                // doubleClickZoom={false}
+                // scrollWheelZoom={false}
+                // zoomControl={false}
 
                 style={{ height: '100%', width: '100%' }}
             >
@@ -79,7 +96,7 @@ export default function StudentMap({ classId }) {
                                 👨‍🏫 ¡El profesor está aquí!
                             </Popup>
                         </Marker>
-                        
+
                         <RecenterMap coords={teacherLocation} />
                     </>
                 )}
