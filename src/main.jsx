@@ -13,6 +13,7 @@ import Home from './pages/Common/Home/Home'
 import AlumnoP from './pages/Common/Profiles/AlumnoP'
 import MaestroP from './pages/Common/Profiles/MaestroP'
 import Info from './pages/Common/Info/Info';
+import InfoP from './pages/Common/Info/Info-Teacher';
 import Equipo from './pages/Common/Equipo/Equipo'
 import HomeTeacher from './pages/Common/Home/Home-Teacher'
 import CommunityContent from './pages/Common/Community/CommunityContent'
@@ -106,6 +107,7 @@ root.render(
 					<Route element={<ProtectedRoute allowedRoles={['teacher']} />}>
 						<Route path="/teacher" element={<HomeTeacher />} />
 						<Route path="/teacher/profile" element={<MaestroP />} />
+						<Route path="/teacher/info" element={<InfoP />} />
 					</Route>
 
 					{/* Rutas compartidas */}
