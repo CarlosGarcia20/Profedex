@@ -26,6 +26,7 @@ import AdminUnits from './pages/admin/school/Units';
 import AdminTopics from './pages/admin/school/Topics';
 import AdminGroupScheduler from './pages/admin/school/GroupScheduler';
 import { AuthProvider } from './context/AuthContext';
+import { PublicRoute } from './components/protectedRoutes/PublicRoute';
 
 import 'leaflet/dist/leaflet.css';
 
@@ -62,10 +63,13 @@ root.render(
 		<BrowserRouter>
 			<Routes>
 				{/* Public Routes */}
-				<Route path="/" element={<Navigate to="/login" />} />
-				<Route path="/login" element={<Login />} />
-				{/* <Route path="/register" element={<Register />} /> */}
+				<Route element={<PublicRoute />}>
+					<Route path="/login" element={<Login />} />
+					{/* <Route path="/register" element={<Register />} /> */}
+				</Route>
 
+				<Route path="/" element={<Navigate to="/login" />} />
+				
 				{/* Admin Route */}
 				<Route element={<ProtectedRoute allowedRoles={['admin']} />}>
 					<Route path='/admin' element={<AdminLayout />}>
