@@ -15,7 +15,8 @@ export default function Sidebar() {
     // const user_image = user?.image || "https://ui-avatars.com/api/?name=" + (user?.name || "User") + "&background=random";
     const user_image = user?.image || "../../../public/user-svgrepo-com.svg";
 
-    const isTeacher = location.pathname.startsWith("/teacher");
+    const userRole = localStorage.getItem("role");
+    const isTeacher = userRole === 'teacher';
     const basePath = isTeacher ? "/teacher" : "/student";
 
     return (
@@ -50,6 +51,7 @@ export default function Sidebar() {
                     isActive={location.pathname.includes("/info")}
                 />
 
+                {/* COMUNIDAD (Ruta compartida) */}
                 <SidebarLink
                     to="/community"
                     icon={<FaFileUpload className="w-6 h-6" />}
