@@ -27,6 +27,8 @@ import AdminTopics from './pages/admin/school/Topics';
 import AdminGroupScheduler from './pages/admin/school/GroupScheduler';
 import { AuthProvider } from './context/AuthContext';
 
+import 'leaflet/dist/leaflet.css';
+
 const root = createRoot(document.getElementById('root'))
 
 root.render(
