@@ -15,7 +15,7 @@ const DAY_MAP = {
 
 export default function InfoTeacher() {
     const [userSchedule, setUserSchedule] = useState([]);
-    const [groupName, setGroupName] = useState("");
+    const [teacherName, setTeacherName] = useState("");
     const [selectedDay, setSelectedDay] = useState("");
 
     const [eventName, setEventName] = useState("");
@@ -26,19 +26,20 @@ export default function InfoTeacher() {
     const [image, setImage] = useState(null);
 
     const fetchSchedule = () => {
-        const schedulePromise = api.get("students/me/schedules");
+        const schedulePromise = api.get("teachers/me/schedules");
 
         toast.promise(schedulePromise, {
             loading: "Obteniendo horario...",
             success: (response) => {
                 setUserSchedule(response.data.data || []);
-                setGroupName(response.data.group || "Sin Grupo");
+                setTeacherName(response.data.data[0].teacher)
+
                 return "Horario cargado";
             },
             error: (err) => {
                 setUserSchedule([]);
                 if (err.response?.status === 404) {
-                    setGroupName("Sin asignación");
+                    setTeacherName("Sin asignación");
                     return err.response.data.message;
                 }
                 return "Error al cargar los datos";
@@ -93,7 +94,6 @@ export default function InfoTeacher() {
             setImage(null);
 
         } catch (error) {
-            console.error(error);
             toast.error("Error al enviar el formulario");
         }
     };
@@ -109,12 +109,12 @@ export default function InfoTeacher() {
                     <div className="flex-1 flex flex-col space-y-4 h-full min-h-0">
                         <div className="shrink-0">
                             <h1 className="text-xl font-bold text-blue-700 mb-2">
-                                Grupo
+                                Nombre del profesor
                             </h1>
                             <input
                                 type="text"
-                                value={groupName}
-                                className="p-2 w-full sm:w-64 rounded-md border border-gray-400 bg-gray-200 text-gray-700 font-medium"
+                                value={teacherName}
+                                className="p-2 w-full md:w-150 rounded-md border border-gray-400 bg-gray-200 text-gray-700 font-medium"
                                 disabled
                             />
                         </div>
@@ -148,7 +148,7 @@ export default function InfoTeacher() {
                                     <thead className="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0 z-10">
                                         <tr>
                                             <th className="px-4 py-3">Día</th>
-                                            <th className="px-4 py-3">Profesor</th>
+                                            <th className="px-4 py-3">Grupo</th>
                                             <th className="px-4 py-3">Hora</th>
                                             <th className="px-4 py-3">Materia</th>
                                             <th className="px-4 py-3">Aula</th>
@@ -165,7 +165,7 @@ export default function InfoTeacher() {
                                                         {DAY_MAP[item.day_of_week]}
                                                     </td>
                                                     <td className="px-4 py-3">
-                                                        {item.master || "Sin asignar"}
+                                                        {item.group || "Sin asignar"}
                                                     </td>
                                                     <td className="px-4 py-3">
                                                         {item.start_time?.slice(0, 5)} -{" "}
@@ -193,126 +193,6 @@ export default function InfoTeacher() {
                                 </table>
                             </div>
                         </div>
-                    </div>
-
-                    {/* RIGHT SIDE — FORMULARIO CREAR EVENTO */}
-                    <div className="flex-1 flex flex-col h-full min-h-0">
-                        <h2 className="text-xl font-bold text-blue-700 mb-2">
-                            Crear Evento
-                        </h2>
-
-                        <form
-                            onSubmit={handleCreateEvent}
-                            className="flex-1 overflow-auto shadow-md rounded-lg border border-gray-300 bg-white p-4 space-y-4"
-                        >
-                            <div>
-                                <label className="font-semibold text-gray-700">
-                                    Nombre del Evento
-                                </label>
-                                <input
-                                    type="text"
-                                    className="mt-1 w-full p-2 border rounded-md"
-                                    value={eventName}
-                                    onChange={(e) =>
-                                        setEventName(e.target.value)
-                                    }
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="font-semibold text-gray-700">
-                                    Descripción
-                                </label>
-                                <textarea
-                                    className="mt-1 w-full p-2 border rounded-md"
-                                    rows={3}
-                                    value={description}
-                                    onChange={(e) =>
-                                        setDescription(e.target.value)
-                                    }
-                                    required
-                                ></textarea>
-                            </div>
-
-                            <div>
-                                <label className="font-semibold text-gray-700">
-                                    Fecha
-                                </label>
-                                <input
-                                    type="date"
-                                    className="mt-1 w-full p-2 border rounded-md"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    required
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="font-semibold text-gray-700">
-                                        Hora Inicio
-                                    </label>
-                                    <input
-                                        type="time"
-                                        className="mt-1 w-full p-2 border rounded-md"
-                                        value={startTime}
-                                        onChange={(e) =>
-                                            setStartTime(e.target.value)
-                                        }
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="font-semibold text-gray-700">
-                                        Hora Fin
-                                    </label>
-                                    <input
-                                        type="time"
-                                        className="mt-1 w-full p-2 border rounded-md"
-                                        value={endTime}
-                                        onChange={(e) =>
-                                            setEndTime(e.target.value)
-                                        }
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="font-semibold text-gray-700">
-                                    Imagen
-                                </label>
-
-                                <div className="mt-2">
-                                    <label
-                                        className="flex items-center gap-3 cursor-pointer bg-blue-600 hover:bg-blue-700  text-white font-medium  px-4 py-2 rounded-md shadow-sm transition w-max"
-                                    >
-                                        Elegir imagen
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={(e) => setImage(e.target.files[0])}
-                                        />
-                                    </label>
-
-                                    {image && (
-                                        <p className="text-sm text-gray-600 mt-1">
-                                            Archivo seleccionado: <span className="font-medium">{image.name}</span>
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <button
-                                type="submit"
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold p-2 rounded-md"
-                            >
-                                Crear Evento
-                            </button>
-                        </form>
                     </div>
                 </main>
             </div>

@@ -30,6 +30,7 @@ import { AuthProvider } from './context/AuthContext';
 import { PublicRoute } from './components/protectedRoutes/PublicRoute';
 
 import 'leaflet/dist/leaflet.css';
+import EventsTeacher from './pages/Common/events/EventsTeacher';
 
 const root = createRoot(document.getElementById('root'))
 
@@ -106,8 +107,9 @@ root.render(
 					{/* Rutas del maestro */}
 					<Route element={<ProtectedRoute allowedRoles={['teacher']} />}>
 						<Route path="/teacher" element={<HomeTeacher />} />
-						<Route path="/teacher/profile" element={<MaestroP />} />
 						<Route path="/teacher/info" element={<InfoP />} />
+						<Route path='/teacher/events' element={<EventsTeacher />} />
+						<Route path="/teacher/profile" element={<MaestroP />} />
 					</Route>
 
 					{/* Rutas compartidas */}

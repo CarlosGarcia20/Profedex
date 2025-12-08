@@ -8,6 +8,7 @@ import {
     HiInformationCircle
 } from "react-icons/hi";
 import { FaFileUpload } from "react-icons/fa";
+import { MdEvent } from "react-icons/md";
 
 export default function Sidebar() {
     const { user } = useAuth();
@@ -50,6 +51,15 @@ export default function Sidebar() {
                     title="Información"
                     isActive={location.pathname.includes("/info")}
                 />
+
+                {isTeacher && (
+                    <SidebarLink
+                        to={`${basePath}/events`}
+                        icon={<MdEvent className="w-7 h-7" />}
+                        title="Eventos"
+                        isActive={location.pathname.includes("/events")}
+                    />
+                )}
 
                 {/* COMUNIDAD (Ruta compartida) */}
                 <SidebarLink
