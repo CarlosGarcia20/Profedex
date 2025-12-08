@@ -19,7 +19,7 @@ jobs:
 
       - name: Install and Build
         env:
-          VITE_API_URL: /api
+          VITE_URL_API: /api
         run: |
           npm install --legacy-peer-deps
           npm run build
