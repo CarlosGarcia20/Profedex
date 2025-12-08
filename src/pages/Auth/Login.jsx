@@ -1,27 +1,78 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import profedex from "../../assets/images/Profedex.png";
+import api from "../../api/axios";
+
+import toast from 'react-hot-toast';
+import { useAuth } from "../../context/AuthContext";
+
+const ROLE_PATHS = {
+	'1': 'admin',
+	'2': 'teacher',
+	'3': 'student'
+};
 
 export default function Login() {
 	const [user, setUser] = useState("");
 	const [password, setPassword] = useState("");
 	const navigate = useNavigate();
+	const { login } = useAuth();
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		const role = user.includes("teacher") ? "teacher" : "student";
+		const loginPromise = api.post('auth', {
+			username: user,
+			password: password
+		});
 
-		localStorage.setItem("isLoggedIn", "true");
-		localStorage.setItem("role", role);
-		localStorage.setItem("username", user);
+		toast.promise(
+			loginPromise,
+			{
+				loading: 'Verificando credenciales...',
+				success: (data) => {
+					const username = data.data.user.nickname;
+					return `¡Bienvenido de nuevo, ${username}!`;
+				},
+				error: (err) => {
+					const responseData = err.response?.data;
 
-		navigate(`/${role}`);
+					if (responseData?.errors) {
+						const errorFields = Object.keys(responseData.errors);
+
+						const firstField = errorFields[0];
+
+						const firstErrorMessage = responseData.errors[firstField][0];
+
+						return firstErrorMessage;
+					}
+
+					return responseData?.message || 'Error al iniciar sesión';
+				},
+			}
+		);
+
+		try {
+			const response = await loginPromise;
+			const { idRol, nickname, name, image } = response.data.user;
+			const rolePath = ROLE_PATHS[String(idRol)];
+
+			login({
+				nickname,
+				name,
+				rolePath,
+				image
+			});
+
+			navigate(`/${rolePath}`);
+		} catch (error) {
+			// console.log("error: " + error);
+		}
 	};
 
 	return (
 		<div className="bg-red-700 min-h-screen flex items-center justify-center p-4">
-			<div class="bg-gray-200 w-full max-w-sm p-8 rounded-xl shadow-lg">
+			<div className="bg-gray-200 w-full max-w-sm p-8 rounded-xl shadow-lg">
 				<div className="mb-8">
 					<img
 						src={profedex}
@@ -45,7 +96,7 @@ export default function Login() {
 							className="w-full py-1 rounded-md bg-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
 							value={user}
 							onChange={(e) => setUser(e.target.value)}
-							placeholder=""
+							autoComplete="off"
 							required
 						/>
 					</div>
@@ -69,7 +120,7 @@ export default function Login() {
 					<div className="col-mb-6 mb-5">
 						<button
 							type="submit"
-							className="bg-blue-800 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
+							className={"w-full text-white py-2 px-4 rounded-md transition duration-300 bg-blue-800 hover:bg-blue-700"}
 						>
 							Acceder
 						</button>
@@ -86,24 +137,9 @@ export default function Login() {
 
 					<hr className="border-gray-400 my-4" />
 
-					<div className="text-center">
-						<a
-							href="#"
-							onClick={(e) => {
-								e.preventDefault();
-								navigate("/register");
-							}}
-							className="text-sm text-blue-900 underline hover:text-blue-950"
-						>
-							Registrarme
-						</a>
-					</div>
-
 				</form>
-				<footer 
-					className="mt-5 p-2 text-center"
-				>
-					Versión: 1.3 - Despliegue Automático CI/CD Funcional
+				<footer className="mt-5 p-2 text-center text-xs text-gray-500">
+					Versión: 1.0 - Despliegue Automático CI/CD Funcional
 				</footer>
 			</div>
 		</div>
