@@ -15,8 +15,6 @@ const InfoMaestros = () => {
 			{
 				loading: 'Cargando maestros...',
 				success: (response) => {
-					console.log(response.data.data);
-
 					setTeachers(response.data.data);
 
 					return 'Maestros cargados'
