@@ -1,37 +1,55 @@
-name: Build and Deploy React App
+name: Despliegue_Web_Projecto
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
   build-and-deploy:
+    name: Construir y Desplegar
     runs-on: ubuntu-latest
-    
+
+    strategy:
+      matrix:
+        vm_id: [1, 2]
+
     steps:
-      - name: Checkout Code
+      - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
-      - name: Install and Build
+      - name: Instalar dependencias
+        run: npm install --legacy-peer-deps
+
+      - name: Construir proyecto
         env:
           VITE_URL_API: /api
           VITE_SOCKET_URL: /
-        run: |
-          npm install --legacy-peer-deps
-          npm run build
+        run: npm run build
 
-      - name: Deploy to VM using SCP
-        uses: appleboy/scp-action@v1.0.0
+      - name: Desplegar archivos en VM
+        uses: easingthemes/ssh-deploy@v5.0.0
         with:
-          host: ${{ secrets.SSH_HOST_AWS }}
-          username: ${{ secrets.SSH_USER_AWS }}
-          key: ${{ secrets.SSH_PRIVATE_KEY_AWS }}
-          port: 22
-          source: "dist/" 
-          target: "/var/www/Profedex/dist"
-          strip_components: 1
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY_AWS }}
+          REMOTE_USER: ${{ secrets.SSH_USER_AWS }}
+          
+          REMOTE_HOST: ${{ matrix.vm_id == 1 && secrets.SSH_HOST || secrets.SSH_HOST_2 }}
+          SOURCE: "dist/"
+
+          TARGET: /var/www/Profedex/dist/
+          ARGS: "-rltgoDzvO --delete"
+
+      - name: Reiniciar Apache en VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ matrix.vm_id == 1 && secrets.SSH_HOST || secrets.SSH_HOST_2 }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl restart apache2
+            echo "¡Despliegue completado en VM ${{ matrix.vm_id }}!"
