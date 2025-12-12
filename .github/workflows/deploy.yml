@@ -39,16 +39,18 @@ jobs:
           REMOTE_USER: ${{ secrets.SSH_USER_AWS }}
           
           REMOTE_HOST: ${{ matrix.vm_id == 1 && secrets.SSH_HOST || secrets.SSH_HOST_2 }}
+          
           SOURCE: "dist/"
-
           TARGET: /var/www/Profedex/dist/
           ARGS: "-rltgoDzvO --delete"
 
       - name: Reiniciar Apache en VM
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ matrix.vm_id == 1 && secrets.SSH_HOST || secrets.SSH_HOST_2 }}
-          username: ${{ secrets.SSH_USER }}
+          host: ${{ matrix.vm_id == 1 && secrets.SSH_HOST|| secrets.SSH_HOST_2 }}
+          
+          username: ${{ secrets.SSH_USER_AWS }}
+          
           key: ${{ secrets.SSH_PRIVATE_KEY_AWS }}
           script: |
             sudo systemctl restart apache2
