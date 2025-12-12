@@ -18,13 +18,6 @@ export default function InfoTeacher() {
     const [teacherName, setTeacherName] = useState("");
     const [selectedDay, setSelectedDay] = useState("");
 
-    const [eventName, setEventName] = useState("");
-    const [description, setDescription] = useState("");
-    const [date, setDate] = useState("");
-    const [startTime, setStartTime] = useState("");
-    const [endTime, setEndTime] = useState("");
-    const [image, setImage] = useState(null);
-
     const fetchSchedule = () => {
         const schedulePromise = api.get("teachers/me/schedules");
 
@@ -59,45 +52,6 @@ export default function InfoTeacher() {
         );
     }, [userSchedule, selectedDay]);
 
-    const handleCreateEvent = async (e) => {
-        e.preventDefault();
-
-        if (!eventName || !description || !date || !startTime || !endTime) {
-            toast.error("Llena todos los campos obligatorios");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append("name", eventName);
-        formData.append("description", description);
-        formData.append("date", date);
-        formData.append("start_time", startTime);
-        formData.append("end_time", endTime);
-        if (image) formData.append("image", image);
-
-        try {
-            const res = api.post("events/create", formData, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
-
-            toast.promise(res, {
-                loading: "Creando evento...",
-                success: "Evento creado correctamente",
-                error: "No se pudo crear el evento"
-            });
-
-            setEventName("");
-            setDescription("");
-            setDate("");
-            setStartTime("");
-            setEndTime("");
-            setImage(null);
-
-        } catch (error) {
-            toast.error("Error al enviar el formulario");
-        }
-    };
-
     return (
         <div className="w-full p-4">
             <div className="mx-auto bg-gray-300 rounded-lg shadow-xl overflow-hidden flex flex-col h-screen max-h-[800px]">
@@ -105,7 +59,6 @@ export default function InfoTeacher() {
 
                 <main className="p-4 md:p-6 flex flex-col lg:flex-row gap-6 h-full overflow-hidden">
 
-                    {/* LEFT SIDE (horario + grupo) */}
                     <div className="flex-1 flex flex-col space-y-4 h-full min-h-0">
                         <div className="shrink-0">
                             <h1 className="text-xl font-bold text-blue-700 mb-2">
