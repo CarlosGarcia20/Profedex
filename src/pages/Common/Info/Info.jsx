@@ -58,14 +58,9 @@ const InfoMaestros = () => {
 		});
 	}
 
-	const handleOpenComments = async (teacher) => {
-		setSelectedTeacher(teacher);
-		setIsModalOpen(true);
-		setComments([]);
-		setLoadingComments(true);
-
+	const fetchComments = async(id) => {
 		try {
-			const response = await api.get(`students/teachers/${teacher.master_id}/comments`);
+			const response = await api.get(`students/teachers/${id}/comments`);
 			setComments(response.data.data || []);
 		} catch (error) {
 			console.error("Error cargando comentarios", error);
@@ -73,6 +68,15 @@ const InfoMaestros = () => {
 		} finally {
 			setLoadingComments(false);
 		}
+	}
+
+	const handleOpenComments = async (teacher) => {
+		setSelectedTeacher(teacher);
+		setIsModalOpen(true);
+		setComments([]);
+		setLoadingComments(true);
+
+		fetchComments(teacher.master_id);
 	};
 
 	const handleCloseModal = () => {
@@ -95,8 +99,7 @@ const InfoMaestros = () => {
 			toast.success("Comentario enviado", { id: loadingId });
 			setNewComment("");
 
-			const response = await api.get(`students/teachers/${selectedTeacher.master_id}/comments`);
-			setComments(response.data.data || []);
+			fetchComments(selectedTeacher.master_id)
 
 		} catch (error) {
 			toast.dismiss(loadingId);
@@ -203,8 +206,8 @@ const InfoMaestros = () => {
 							comments.map((comment, idx) => (
 								<div key={idx} className="flex gap-3 bg-gray-50 p-3 rounded-xl">
 									<div className="shrink-0 text-gray-400">
-										{comment.author_image ? (
-											<img src={comment.author_image} className="w-8 h-8 rounded-full object-cover" />
+										{comment.image ? (
+											<img src={comment.image} className="w-8 h-8 rounded-full object-cover" />
 										) : (
 											<IoPersonCircle size={32} />
 										)}
@@ -212,7 +215,7 @@ const InfoMaestros = () => {
 									<div>
 										<div className="flex items-center gap-2 mb-1">
 											<span className="font-bold text-sm text-gray-800">
-												{comment.author_name || "Estudiante Anónimo"}
+												{comment.name || "Estudiante Anónimo"}
 											</span>
 											<span className="text-xs text-gray-400">
 												{new Date(comment.created_at || Date.now()).toLocaleDateString()}
@@ -238,7 +241,7 @@ const InfoMaestros = () => {
 							value={newComment}
 							onChange={(e) => setNewComment(e.target.value)}
 							placeholder="Escribe tu opinión de manera respetuosa..."
-							className="w-full p-3 bg-gray-100 border-none rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none text-sm"
+							className="w-full p-3 bg-gray-100 border-none text-black rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none text-sm"
 							rows="2"
 							required
 						></textarea>
