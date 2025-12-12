@@ -58,11 +58,11 @@ export default function AdminSidebar() {
 
                 <AdminLink to="/admin" end icon={<MdSpaceDashboard />} label="Dashboard" />
 
-                {/* --- GRUPO ESCOLAR --- */}
+                {/* --- GRUPO USUARIOS --- */}
                 <SidebarGroup icon={<FaUser />} label="Gestión de usuarios" >
-                    <AdminLink to="/admin/users" icon={<FaUserPlus />} label="Usuarios" />
-                    <AdminLink to="/admin/students" icon={<FaUserGraduate />} label="Estudiantes" />
-                    <AdminLink to="/admin/teachers" icon={<FaUserTie />} label="Profesores" />
+                    <AdminLink to="/admin/users" icon={<FaUserPlus />} label="Usuarios" isChild />
+                    <AdminLink to="/admin/students" icon={<FaUserGraduate />} label="Estudiantes" isChild />
+                    <AdminLink to="/admin/teachers" icon={<FaUserTie />} label="Profesores" isChild />
 
                 </SidebarGroup> 
 

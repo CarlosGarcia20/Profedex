@@ -31,6 +31,7 @@ import { PublicRoute } from './components/protectedRoutes/PublicRoute';
 
 import 'leaflet/dist/leaflet.css';
 import EventsTeacher from './pages/Common/events/EventsTeacher';
+import AdminTeachers from './pages/admin/Users/Teachers';
 
 const root = createRoot(document.getElementById('root'))
 
@@ -82,6 +83,7 @@ root.render(
 						{/* Rutas para la gestión de usuarios */}
 						<Route path='users' element={<AdminUsers />} />
 						<Route path='users/students' element={<AdminUsers />} />
+						<Route path='teachers' element={<AdminTeachers />} />
 
 						{/* Rutas para la gestión escolar */}
 						<Route path='majors' element={<AdminMajors />} />
