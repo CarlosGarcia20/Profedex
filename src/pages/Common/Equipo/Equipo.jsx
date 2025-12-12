@@ -55,18 +55,18 @@ export default function Equipo() {
 		)
 	}
 
-	const fetchRetakes = async() => {
-		try {
-			const response = await api.get('students/me/retakes');
-			setUserRetakes(response.data.data);
-		} catch (error) {
-			console.error(error);
-		}
-	}
+	// const fetchRetakes = async() => {
+	// 	try {
+	// 		const response = await api.get('students/me/retakes');
+	// 		setUserRetakes(response.data.data);
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// }
 
 	useEffect(() => {
 		fetchSchedule();
-		fetchRetakes();
+		// fetchRetakes();
 	}, []);
 
 	const filteredSchedule = useMemo(() => {
@@ -171,7 +171,7 @@ export default function Equipo() {
 						</div>
 					</div>
 
-					<div className="flex-1 flex flex-col h-full min-h-0">
+					{/* <div className="flex-1 flex flex-col h-full min-h-0">
 						<h2 className="text-xl font-bold text-blue-700 mb-2 shrink-0">Recursamiento</h2>
 
 						<div className="flex-1 overflow-auto shadow-md rounded-lg border border-gray-300 bg-white relative">
@@ -193,7 +193,6 @@ export default function Equipo() {
 											return (
 												<tr key={item.id} className="hover:bg-red-50 transition-colors">
 
-													{ /* FECHA Y HORA */}
 													<td className="px-4 py-3 text-gray-700">
 														<div className="flex flex-col">
 															<span className="font-bold text-gray-900 capitalize">
@@ -212,22 +211,18 @@ export default function Equipo() {
 														</div>
 													</td>
 
-													{ /* MATERIA */}
 													<td className="px-4 py-3 font-medium text-gray-900">
 														{item.subject}
 													</td>
 
-													{ /* SALÓN / AULA */}
 													<td className="px-4 py-3 font-medium text-gray-900">
 														{item.classroom}
 													</td>
 
-													{ /* NÚMERO DE INTENTO */}
 													<td className="px-4 py-3 font-medium text-gray-900">
 														{item.attempt_number}
 													</td>
 
-													{ /* ESTADO */}
 													<td className="px-4 py-3 font-medium text-gray-900s">
 														{STATUS_MAP[item.status]}
 													</td>
@@ -242,7 +237,7 @@ export default function Equipo() {
 								</tbody>
 							</table>
 						</div>
-					</div>
+					</div> */}
 
 				</main>
 			</div>
