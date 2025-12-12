@@ -126,20 +126,20 @@ export default function Login() {
 						</button>
 					</div>
 
-					<div className="text-left mb-10">
+					{/* <div className="text-left mb-10">
 						<a
 							href="#"
 							className="text-sm text-blue-900 underline hover:text-blue-950"
 						>
 							Olvidé mi contraseña
 						</a>
-					</div>
+					</div> */}
 
 					<hr className="border-gray-400 my-4" />
 
 				</form>
 				<footer className="mt-5 p-2 text-center text-xs text-gray-500">
-					Versión: 1.0 - Despliegue Automático CI/CD Funcional
+					Versión: 1.1 - Despliegue Automático CI/CD Funcional
 				</footer>
 			</div>
 		</div>
