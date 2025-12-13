@@ -42,16 +42,6 @@ export default function ThemeToggle() {
             <AnimatePresence mode="wait" initial={false}>
                 {theme === 'dark' ? (
                     <motion.div
-                        key="moon"
-                        initial={{ rotateY: 90, opacity: 0 }}
-                        animate={{ rotateY: 0, opacity: 1 }}
-                        exit={{ rotateY: -90, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <IoMoon className="w-5 h-5" />
-                    </motion.div>
-                ) : (
-                    <motion.div
                         key="sun"
                         initial={{ rotate: -180, opacity: 0 }}
                         animate={{ rotate: 0, opacity: 1 }}
@@ -60,6 +50,16 @@ export default function ThemeToggle() {
                     >
                         <IoSunny className="w-5 h-5" />
                     </motion.div>
+                ) : (
+                        <motion.div
+                            key="moon"
+                            initial={{ rotateY: 90, opacity: 0 }}
+                            animate={{ rotateY: 0, opacity: 1 }}
+                            exit={{ rotateY: -90, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <IoMoon className="w-5 h-5" />
+                        </motion.div>
                 )}
             </AnimatePresence>
         </button>
